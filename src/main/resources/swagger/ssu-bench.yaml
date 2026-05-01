@@ -467,24 +467,29 @@ components:
           type: string
         reward:
           type: integer
+          format: int64
           minimum: 1
     TaskResponse:
       type: object
       properties:
         id:
           type: integer
+          format: int64
         title:
           type: string
         description:
           type: string
         reward:
           type: integer
+          format: int64
         status:
           $ref: '#/components/schemas/TaskStatusEnum'
         customerId:
           type: integer
-        selectedExecutorId:
+          format: int64
+        executorId:
           type: integer
+          format: int64
           nullable: true
         createdAt:
           type: string
@@ -497,10 +502,13 @@ components:
       properties:
         id:
           type: integer
+          format: int64
         taskId:
           type: integer
+          format: int64
         executorId:
           type: integer
+          format: int64
         status:
           $ref: '#/components/schemas/BidStatusEnum'
         createdAt:
@@ -511,12 +519,14 @@ components:
       properties:
         id:
           type: integer
+          format: int64
         username:
           type: string
         role:
           $ref: '#/components/schemas/RoleEnum'
         balance:
           type: integer
+          format: int64
         status:
           $ref: '#/components/schemas/UserStatusEnum'
         createdAt:
@@ -554,8 +564,10 @@ components:
       properties:
         page:
           type: integer
+          format: int64
         size:
           type: integer
+          format: int64
         totalElements:
           type: integer
         totalPages:
