@@ -42,7 +42,6 @@ tasks.withType<Test> {
 }
 
 openApiGenerate {
-    group = "openapi tools"
     generatorName.set("spring")
     inputSpec.set("$rootDir/src/main/resources/swagger/ssu-bench.yaml")
     outputDir.set("${layout.buildDirectory.get().asFile}/generated")
@@ -65,9 +64,9 @@ openApiGenerate {
             "containerDefaultToNull" to "true",
             "useSpringBoot3" to "true",
             "additionalModelTypeAnnotations" to (
-                    "@com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true);" +
-                            "@com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)"
-                    )
+                "@com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true);" +
+                    "@com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)"
+                )
         )
     )
 
