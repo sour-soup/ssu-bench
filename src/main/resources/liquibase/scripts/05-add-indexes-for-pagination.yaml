@@ -19,9 +19,4 @@ databaseChangeLog:
             indexName: idx_users_created_at_desc
             columns:
               - column: { name: created_at }
-        - createIndex:
-            tableName: tasks
-            indexName: idx_tasks_reward
-            columns:
-              - column: { name: reward }
-            where: "status = 'PUBLISHED'"
+

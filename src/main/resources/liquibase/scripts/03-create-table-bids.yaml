@@ -38,13 +38,11 @@ databaseChangeLog:
             constraintName: uk_bids_task_executor
         - createIndex:
             tableName: bids
-            indexName: idx_bids_task_status
+            indexName: idx_bids_task
             columns:
               - column: { name: task_id }
-              - column: { name: status }
         - createIndex:
             tableName: bids
-            indexName: idx_bids_executor_status
+            indexName: idx_bids_executor
             columns:
               - column: { name: executor_id }
-              - column: { name: status }

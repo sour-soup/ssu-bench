@@ -14,6 +14,4 @@ databaseChangeLog:
   - include:
       file: "scripts/05-add-indexes-for-pagination.yaml"
       relativeToChangelogFile: true
-  - include:
-      file: "scripts/06-add-composite-indexes-for-common-queries.yaml"
-      relativeToChangelogFile: true
+

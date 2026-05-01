@@ -14,7 +14,7 @@ databaseChangeLog:
               - column: { name: reward, type: BIGINT, remarks: "Reward in soups, minimum 1" }
               - column: { name: status, type: VARCHAR(32), defaultValue: "DRAFT", remarks: "DRAFT, PUBLISHED, IN_PROGRESS, COMPLETED, CANCELLED" }
               - column: { name: customer_id, type: BIGINT, remarks: "Creator (customer)" }
-              - column: { name: selected_executor_id, type: BIGINT, remarks: "Executor who won the bid, nullable" }
+              - column: { name: executor_id, type: BIGINT, remarks: "Executor who won the bid, nullable" }
               - column: { name: created_at, type: TIMESTAMP, defaultValueComputed: "CURRENT_TIMESTAMP" }
               - column: { name: updated_at, type: TIMESTAMP, defaultValueComputed: "CURRENT_TIMESTAMP" }
         - addPrimaryKey:
@@ -31,24 +31,17 @@ databaseChangeLog:
         - addForeignKeyConstraint:
             constraintName: fk_tasks_executor_id
             baseTableName: tasks
-            baseColumnNames: selected_executor_id
+            baseColumnNames: executor_id
             referencedTableName: users
             referencedColumnNames: id
             onDelete: SET NULL
         - createIndex:
             tableName: tasks
-            indexName: idx_tasks_customer_status
+            indexName: idx_tasks_customer
             columns:
               - column: { name: customer_id }
-              - column: { name: status }
-        - createIndex:
-            tableName: tasks
-            indexName: idx_tasks_status_created
-            columns:
-              - column: { name: status }
-              - column: { name: created_at }
         - createIndex:
             tableName: tasks
             indexName: idx_tasks_selected_executor
             columns:
-              - column: { name: selected_executor_id }
+              - column: { name: executor_id }
