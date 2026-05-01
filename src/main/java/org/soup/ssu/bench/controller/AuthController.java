@@ -9,13 +9,14 @@ import ssu.bench.model.RegisterRequest;
 
 @RestController
 public class AuthController implements AuthApi {
+
     @Override
-    public ResponseEntity<AuthResponse> authLoginPost(LoginRequest loginRequest) {
+    public ResponseEntity<AuthResponse> postAuthLogin(LoginRequest loginRequest) {
         return null;
     }
 
     @Override
-    public ResponseEntity<AuthResponse> authRegisterPost(RegisterRequest registerRequest) {
+    public ResponseEntity<AuthResponse> postAuthRegister(RegisterRequest registerRequest) {
         return null;
     }
 }

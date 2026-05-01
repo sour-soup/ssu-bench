@@ -9,18 +9,19 @@ import java.math.BigInteger;
 
 @RestController
 public class AdminController implements AdminApi {
+
     @Override
-    public ResponseEntity<PageUserResponse> adminUsersGet(Integer page, Integer size) {
+    public ResponseEntity<PageUserResponse> getListUsers(Integer page, Integer size) {
         return null;
     }
 
     @Override
-    public ResponseEntity<Void> adminUsersUserIdBlockPost(BigInteger userId) {
+    public ResponseEntity<Void> postBlockUser(BigInteger userId) {
         return null;
     }
 
     @Override
-    public ResponseEntity<Void> adminUsersUserIdUnblockPost(BigInteger userId) {
+    public ResponseEntity<Void> postUnblockUser(BigInteger userId) {
         return null;
     }
 }

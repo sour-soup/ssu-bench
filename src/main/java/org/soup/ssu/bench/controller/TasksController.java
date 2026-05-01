@@ -13,37 +13,37 @@ import java.math.BigInteger;
 @RestController
 public class TasksController implements TasksApi {
     @Override
-    public ResponseEntity<PageTaskResponse> tasksGet(Integer page, Integer size, TaskStatusEnum status) {
+    public ResponseEntity<PageTaskResponse> getListTasks(Integer page, Integer size, TaskStatusEnum status) {
         return null;
     }
 
     @Override
-    public ResponseEntity<TaskResponse> tasksPost(CreateTaskRequest createTaskRequest) {
+    public ResponseEntity<TaskResponse> getTaskById(BigInteger taskId) {
         return null;
     }
 
     @Override
-    public ResponseEntity<TaskResponse> tasksTaskIdCancelPost(BigInteger taskId) {
+    public ResponseEntity<TaskResponse> postCancelTask(BigInteger taskId) {
         return null;
     }
 
     @Override
-    public ResponseEntity<TaskResponse> tasksTaskIdCompletePost(BigInteger taskId) {
+    public ResponseEntity<TaskResponse> postCompleteTask(BigInteger taskId) {
         return null;
     }
 
     @Override
-    public ResponseEntity<TaskResponse> tasksTaskIdConfirmPost(BigInteger taskId) {
+    public ResponseEntity<TaskResponse> postConfirmTask(BigInteger taskId) {
         return null;
     }
 
     @Override
-    public ResponseEntity<TaskResponse> tasksTaskIdGet(BigInteger taskId) {
+    public ResponseEntity<TaskResponse> postCreateTask(CreateTaskRequest createTaskRequest) {
         return null;
     }
 
     @Override
-    public ResponseEntity<TaskResponse> tasksTaskIdPublishPost(BigInteger taskId) {
+    public ResponseEntity<TaskResponse> postPublishTask(BigInteger taskId) {
         return null;
     }
 }

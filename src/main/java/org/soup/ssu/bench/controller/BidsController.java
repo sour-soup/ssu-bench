@@ -11,17 +11,17 @@ import java.math.BigInteger;
 @RestController
 public class BidsController implements BidsApi {
     @Override
-    public ResponseEntity<BidResponse> bidsBidIdAcceptPost(BigInteger bidId) {
+    public ResponseEntity<PageBidResponse> getTaskBids(BigInteger taskId, Integer page, Integer size) {
         return null;
     }
 
     @Override
-    public ResponseEntity<PageBidResponse> tasksTaskIdBidsGet(BigInteger taskId, Integer page, Integer size) {
+    public ResponseEntity<BidResponse> postAcceptBid(BigInteger bidId) {
         return null;
     }
 
     @Override
-    public ResponseEntity<BidResponse> tasksTaskIdBidsPost(BigInteger taskId) {
+    public ResponseEntity<BidResponse> postCreateBid(BigInteger taskId) {
         return null;
     }
 }
