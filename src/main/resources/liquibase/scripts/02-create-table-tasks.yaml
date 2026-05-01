@@ -11,7 +11,7 @@ databaseChangeLog:
               - column: { name: id, type: BIGINT, autoIncrement: true, remarks: "PK" }
               - column: { name: title, type: VARCHAR(255), remarks: "Task title" }
               - column: { name: description, type: TEXT, remarks: "Task description" }
-              - column: { name: reward, type: BIGINT, remarks: "Reward in cents, minimum 1" }
+              - column: { name: reward, type: BIGINT, remarks: "Reward in soups, minimum 1" }
               - column: { name: status, type: VARCHAR(32), defaultValue: "DRAFT", remarks: "DRAFT, PUBLISHED, IN_PROGRESS, COMPLETED, CANCELLED" }
               - column: { name: customer_id, type: BIGINT, remarks: "Creator (customer)" }
               - column: { name: selected_executor_id, type: BIGINT, remarks: "Executor who won the bid, nullable" }

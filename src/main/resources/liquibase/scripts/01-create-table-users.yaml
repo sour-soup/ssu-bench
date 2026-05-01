@@ -12,7 +12,7 @@ databaseChangeLog:
               - column: { name: username, type: VARCHAR(255), remarks: "Unique login" }
               - column: { name: password_hash, type: VARCHAR(255), remarks: "BCrypt hash" }
               - column: { name: role, type: VARCHAR(32), remarks: "CUSTOMER, EXECUTOR, ADMIN" }
-              - column: { name: balance, type: BIGINT, defaultValueNumeric: 0, remarks: "User balance in cents" }
+              - column: { name: balance, type: BIGINT, defaultValueNumeric: 0, remarks: "User balance in soups" }
               - column: { name: status, type: VARCHAR(32), defaultValue: "ACTIVE", remarks: "ACTIVE, BLOCKED" }
               - column: { name: created_at, type: TIMESTAMP, defaultValueComputed: "CURRENT_TIMESTAMP", remarks: "Creation time" }
               - column: { name: updated_at, type: TIMESTAMP, defaultValueComputed: "CURRENT_TIMESTAMP", remarks: "Last update time" }

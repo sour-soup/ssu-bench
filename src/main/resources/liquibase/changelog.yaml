@@ -9,7 +9,7 @@ databaseChangeLog:
       file: "scripts/03-create-table-bids.yaml"
       relativeToChangelogFile: true
   - include:
-      file: "scripts/04-add-auto-update-triggers.yaml"
+      file: "scripts/04-create-table-payments.yaml"
       relativeToChangelogFile: true
   - include:
       file: "scripts/05-add-indexes-for-pagination.yaml"

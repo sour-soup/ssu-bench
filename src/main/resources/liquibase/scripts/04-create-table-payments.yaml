@@ -1,0 +1,60 @@
+databaseChangeLog:
+  - changeSet:
+      id: 04
+      author: sour-soup
+      comment: "Create payments table for holds and transfers"
+      changes:
+        - createTable:
+            tableName: payments
+            remarks: "Payment holds and transfers between users"
+            columns:
+              - column: { name: id, type: BIGINT, autoIncrement: true, remarks: "PK" }
+              - column: { name: task_id, type: BIGINT, remarks: "Related task" }
+              - column: { name: customer_id, type: BIGINT, remarks: "Payer (customer)" }
+              - column: { name: executor_id, type: BIGINT, remarks: "Payee (executor)" }
+              - column: { name: amount, type: BIGINT, remarks: "Amount in soups" }
+              - column: { name: type, type: VARCHAR(32), remarks: "HOLD, RELEASE, PAYMENT" }
+              - column: { name: created_at, type: TIMESTAMP, defaultValueComputed: "CURRENT_TIMESTAMP" }
+        - addPrimaryKey:
+            tableName: payments
+            columnNames: id
+            constraintName: pk_payments
+        - addForeignKeyConstraint:
+            constraintName: fk_payments_task_id
+            baseTableName: payments
+            baseColumnNames: task_id
+            referencedTableName: tasks
+            referencedColumnNames: id
+            onDelete: RESTRICT
+        - addForeignKeyConstraint:
+            constraintName: fk_payments_customer_id
+            baseTableName: payments
+            baseColumnNames: customer_id
+            referencedTableName: users
+            referencedColumnNames: id
+            onDelete: RESTRICT
+        - addForeignKeyConstraint:
+            constraintName: fk_payments_executor_id
+            baseTableName: payments
+            baseColumnNames: executor_id
+            referencedTableName: users
+            referencedColumnNames: id
+            onDelete: RESTRICT
+        - sql:
+            splitStatements: false
+            sql: ALTER TABLE payments ADD CONSTRAINT ck_payments_amount CHECK (amount > 0);
+        - createIndex:
+            tableName: payments
+            indexName: idx_payments_task_id
+            columns:
+              - column: { name: task_id }
+        - createIndex:
+            tableName: payments
+            indexName: idx_payments_customer_id
+            columns:
+              - column: { name: customer_id }
+        - createIndex:
+            tableName: payments
+            indexName: idx_payments_executor_id
+            columns:
+              - column: { name: executor_id }
