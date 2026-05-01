@@ -14,6 +14,13 @@ java {
     }
 }
 
+tasks {
+    compileJava {
+        inputs.files(processResources)
+        dependsOn("openApiGenerate")
+    }
+}
+
 repositories {
     mavenCentral()
 }
@@ -27,6 +34,7 @@ dependencies {
     compileOnly("org.projectlombok:lombok")
     runtimeOnly("org.postgresql:postgresql")
     annotationProcessor("org.projectlombok:lombok")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
     testImplementation("org.springframework.boot:spring-boot-starter-data-jdbc-test")
     testImplementation("org.springframework.boot:spring-boot-starter-liquibase-test")
     testImplementation("org.springframework.boot:spring-boot-starter-restclient-test")
@@ -39,6 +47,12 @@ dependencies {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+sourceSets {
+    main {
+        java.srcDirs(layout.buildDirectory.dir("generated/src/main/java"))
+    }
 }
 
 openApiGenerate {
