@@ -1,3 +1,14 @@
 spring:
   application:
     name: ssu-bench
+  datasource:
+    url: ${POSTGRES_URI}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  liquibase:
+    change-log: "classpath:/liquibase/changelog.yaml"
+
+server:
+  port: 8080
+  shutdown: graceful
