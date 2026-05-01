@@ -1,0 +1,574 @@
+openapi: 3.1.0
+info:
+  title: SsuBench API
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+
+security:
+  - bearerAuth: [ ]
+
+tags:
+  - name: Auth
+  - name: Tasks
+  - name: Bids
+  - name: Admin
+
+paths:
+  /auth/register:
+    post:
+      tags: [ Auth ]
+      security: [ ]
+      summary: Register new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /auth/login:
+    post:
+      tags: [ Auth ]
+      security: [ ]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: JWT issued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /tasks:
+    post:
+      tags: [ Tasks ]
+      summary: Create task
+      security:
+        - bearerAuth: [ CUSTOMER ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaskRequest'
+      responses:
+        '201':
+          description: Task created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+    get:
+      tags: [ Tasks ]
+      summary: List tasks
+      security:
+        - bearerAuth: [ CUSTOMER, EXECUTOR, ADMIN ]
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/TaskStatusEnum'
+      responses:
+        '200':
+          description: Task page
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageTaskResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /tasks/{taskId}:
+    get:
+      tags: [ Tasks ]
+      summary: Get task by id
+      security:
+        - bearerAuth: [ CUSTOMER, EXECUTOR, ADMIN ]
+      parameters:
+        - $ref: '#/components/parameters/TaskId'
+      responses:
+        '200':
+          description: Task
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /tasks/{taskId}/publish:
+    post:
+      tags: [ Tasks ]
+      summary: Publish task
+      security:
+        - bearerAuth: [ CUSTOMER ]
+      parameters:
+        - $ref: '#/components/parameters/TaskId'
+      responses:
+        '200':
+          description: Task published
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /tasks/{taskId}/cancel:
+    post:
+      tags: [ Tasks ]
+      summary: Cancel task
+      security:
+        - bearerAuth: [ CUSTOMER ]
+      parameters:
+        - $ref: '#/components/parameters/TaskId'
+      responses:
+        '200':
+          description: Task cancelled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /tasks/{taskId}/complete:
+    post:
+      tags: [ Tasks ]
+      summary: Mark task as completed
+      security:
+        - bearerAuth: [ EXECUTOR ]
+      parameters:
+        - $ref: '#/components/parameters/TaskId'
+      responses:
+        '200':
+          description: Task marked completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /tasks/{taskId}/confirm:
+    post:
+      tags: [ Tasks ]
+      summary: Confirm completion and transfer payment
+      security:
+        - bearerAuth: [ CUSTOMER ]
+      parameters:
+        - $ref: '#/components/parameters/TaskId'
+      responses:
+        '200':
+          description: Task confirmed and payment processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /tasks/{taskId}/bids:
+    get:
+      tags: [ Bids ]
+      summary: List bids for task
+      security:
+        - bearerAuth: [ CUSTOMER ]
+      parameters:
+        - $ref: '#/components/parameters/TaskId'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: Bid page
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageBidResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    post:
+      tags: [ Bids ]
+      summary: Create bid
+      security:
+        - bearerAuth: [ EXECUTOR ]
+      parameters:
+        - $ref: '#/components/parameters/TaskId'
+      responses:
+        '201':
+          description: Bid created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BidResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /bids/{bidId}/accept:
+    post:
+      tags: [ Bids ]
+      summary: Accept bid
+      security:
+        - bearerAuth: [ CUSTOMER ]
+      parameters:
+        - $ref: '#/components/parameters/BidId'
+      responses:
+        '200':
+          description: Bid accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BidResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /admin/users:
+    get:
+      tags: [ Admin ]
+      summary: List users
+      security:
+        - bearerAuth: [ ADMIN ]
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: User page
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageUserResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /admin/users/{userId}/block:
+    post:
+      tags: [ Admin ]
+      summary: Block user
+      security:
+        - bearerAuth: [ ADMIN ]
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '204':
+          description: User blocked
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /admin/users/{userId}/unblock:
+    post:
+      tags: [ Admin ]
+      summary: Unblock user
+      security:
+        - bearerAuth: [ ADMIN ]
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '204':
+          description: User unblocked
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    TaskId:
+      name: taskId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+    BidId:
+      name: bidId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+    UserId:
+      name: userId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    Size:
+      name: size
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  schemas:
+    RegisterRequest:
+      type: object
+      required: [ email, password, role ]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+    LoginRequest:
+      type: object
+      required: [ email, password ]
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    AuthResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+    CreateTaskRequest:
+      type: object
+      required: [ title, description, reward ]
+      properties:
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        reward:
+          type: integer
+          minimum: 1
+    TaskResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        reward:
+          type: integer
+        status:
+          $ref: '#/components/schemas/TaskStatusEnum'
+        customerId:
+          type: integer
+        selectedExecutorId:
+          type: integer
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    BidResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        taskId:
+          type: integer
+        executorId:
+          type: integer
+        status:
+          $ref: '#/components/schemas/BidStatusEnum'
+        createdAt:
+          type: string
+          format: date-time
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+        balance:
+          type: integer
+        status:
+          $ref: '#/components/schemas/UserStatusEnum'
+        createdAt:
+          type: string
+          format: date-time
+    PageTaskResponse:
+      allOf:
+        - $ref: '#/components/schemas/PageMeta'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/TaskResponse'
+    PageBidResponse:
+      allOf:
+        - $ref: '#/components/schemas/PageMeta'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/BidResponse'
+    PageUserResponse:
+      allOf:
+        - $ref: '#/components/schemas/PageMeta'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/UserResponse'
+    PageMeta:
+      type: object
+      properties:
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+    RoleEnum:
+      type: string
+      enum: [ CUSTOMER, EXECUTOR, ADMIN ]
+    UserStatusEnum:
+      type: string
+      enum: [ ACTIVE, BLOCKED ]
+    TaskStatusEnum:
+      type: string
+      enum: [ DRAFT, PUBLISHED, IN_PROGRESS, COMPLETED, CANCELLED ]
+    BidStatusEnum:
+      type: string
+      enum: [ PENDING, ACCEPTED, REJECTED ]
