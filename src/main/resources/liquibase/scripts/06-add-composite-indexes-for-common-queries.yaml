@@ -1,0 +1,25 @@
+databaseChangeLog:
+  - changeSet:
+      id: 06
+      author: sour-soup
+      comment: "Composite indexes for role-based and status-based queries"
+      changes:
+        - createIndex:
+            tableName: users
+            indexName: idx_users_role_balance
+            columns:
+              - column: { name: role }
+              - column: { name: balance }
+        - createIndex:
+            tableName: tasks
+            indexName: idx_tasks_customer_created
+            columns:
+              - column: { name: customer_id }
+              - column: { name: created_at }
+        - createIndex:
+            tableName: tasks
+            indexName: idx_tasks_executor_created
+            columns:
+              - column: { name: selected_executor_id }
+              - column: { name: created_at }
+            where: "selected_executor_id IS NOT NULL"

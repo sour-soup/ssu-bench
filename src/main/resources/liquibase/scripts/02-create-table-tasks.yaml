@@ -1,0 +1,54 @@
+databaseChangeLog:
+  - changeSet:
+      id: 02
+      author: sour-soup
+      comment: "Create tasks table with lifecycle statuses"
+      changes:
+        - createTable:
+            tableName: tasks
+            remarks: "Tasks created by customers"
+            columns:
+              - column: { name: id, type: BIGINT, autoIncrement: true, remarks: "PK" }
+              - column: { name: title, type: VARCHAR(255), remarks: "Task title" }
+              - column: { name: description, type: TEXT, remarks: "Task description" }
+              - column: { name: reward, type: BIGINT, remarks: "Reward in cents, minimum 1" }
+              - column: { name: status, type: VARCHAR(32), defaultValue: "DRAFT", remarks: "DRAFT, PUBLISHED, IN_PROGRESS, COMPLETED, CANCELLED" }
+              - column: { name: customer_id, type: BIGINT, remarks: "Creator (customer)" }
+              - column: { name: selected_executor_id, type: BIGINT, remarks: "Executor who won the bid, nullable" }
+              - column: { name: created_at, type: TIMESTAMP, defaultValueComputed: "CURRENT_TIMESTAMP" }
+              - column: { name: updated_at, type: TIMESTAMP, defaultValueComputed: "CURRENT_TIMESTAMP" }
+        - addPrimaryKey:
+            tableName: tasks
+            columnNames: id
+            constraintName: pk_tasks
+        - addForeignKeyConstraint:
+            constraintName: fk_tasks_customer_id
+            baseTableName: tasks
+            baseColumnNames: customer_id
+            referencedTableName: users
+            referencedColumnNames: id
+            onDelete: RESTRICT
+        - addForeignKeyConstraint:
+            constraintName: fk_tasks_executor_id
+            baseTableName: tasks
+            baseColumnNames: selected_executor_id
+            referencedTableName: users
+            referencedColumnNames: id
+            onDelete: SET NULL
+        - createIndex:
+            tableName: tasks
+            indexName: idx_tasks_customer_status
+            columns:
+              - column: { name: customer_id }
+              - column: { name: status }
+        - createIndex:
+            tableName: tasks
+            indexName: idx_tasks_status_created
+            columns:
+              - column: { name: status }
+              - column: { name: created_at }
+        - createIndex:
+            tableName: tasks
+            indexName: idx_tasks_selected_executor
+            columns:
+              - column: { name: selected_executor_id }

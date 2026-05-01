@@ -1,0 +1,35 @@
+databaseChangeLog:
+  - changeSet:
+      id: 04
+      author: sour-soup
+      comment: "Add triggers to auto-update updated_at columns"
+      changes:
+        - sql:
+            dbms: postgresql
+            splitStatements: false
+            sql: |
+              CREATE OR REPLACE FUNCTION update_updated_at_column()
+              RETURNS TRIGGER AS $$
+              BEGIN
+                  NEW.updated_at = CURRENT_TIMESTAMP;
+                  RETURN NEW;
+              END;
+              $$ language 'plpgsql';
+        - sql:
+            dbms: postgresql
+            sql: |
+              CREATE TRIGGER update_users_updated_at
+              BEFORE UPDATE ON users
+              FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+        - sql:
+            dbms: postgresql
+            sql: |
+              CREATE TRIGGER update_tasks_updated_at
+              BEFORE UPDATE ON tasks
+              FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+        - sql:
+            dbms: postgresql
+            sql: |
+              CREATE TRIGGER update_bids_updated_at
+              BEFORE UPDATE ON bids
+              FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

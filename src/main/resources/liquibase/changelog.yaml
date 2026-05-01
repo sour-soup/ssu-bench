@@ -1,1 +1,19 @@
-databaseChangeLog: [ ]
+databaseChangeLog:
+  - include:
+      file: "scripts/01-create-table-users.yaml"
+      relativeToChangelogFile: true
+  - include:
+      file: "scripts/02-create-table-tasks.yaml"
+      relativeToChangelogFile: true
+  - include:
+      file: "scripts/03-create-table-bids.yaml"
+      relativeToChangelogFile: true
+  - include:
+      file: "scripts/04-add-auto-update-triggers.yaml"
+      relativeToChangelogFile: true
+  - include:
+      file: "scripts/05-add-indexes-for-pagination.yaml"
+      relativeToChangelogFile: true
+  - include:
+      file: "scripts/06-add-composite-indexes-for-common-queries.yaml"
+      relativeToChangelogFile: true

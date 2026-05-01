@@ -1,0 +1,50 @@
+databaseChangeLog:
+  - changeSet:
+      id: 03
+      author: sour-soup
+      comment: "Create bids table for task applications"
+      changes:
+        - createTable:
+            tableName: bids
+            remarks: "Bids from executors to tasks"
+            columns:
+              - column: { name: id, type: BIGINT, autoIncrement: true, remarks: "PK" }
+              - column: { name: task_id, type: BIGINT, remarks: "Target task" }
+              - column: { name: executor_id, type: BIGINT, remarks: "Executor who placed bid" }
+              - column: { name: status, type: VARCHAR(32), defaultValue: "PENDING", remarks: "PENDING, ACCEPTED, REJECTED" }
+              - column: { name: created_at, type: TIMESTAMP, defaultValueComputed: "CURRENT_TIMESTAMP" }
+              - column: { name: updated_at, type: TIMESTAMP, defaultValueComputed: "CURRENT_TIMESTAMP" }
+        - addPrimaryKey:
+            tableName: bids
+            columnNames: id
+            constraintName: pk_bids
+        - addForeignKeyConstraint:
+            constraintName: fk_bids_task_id
+            baseTableName: bids
+            baseColumnNames: task_id
+            referencedTableName: tasks
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            constraintName: fk_bids_executor_id
+            baseTableName: bids
+            baseColumnNames: executor_id
+            referencedTableName: users
+            referencedColumnNames: id
+            onDelete: RESTRICT
+        - addUniqueConstraint:
+            tableName: bids
+            columnNames: task_id, executor_id
+            constraintName: uk_bids_task_executor
+        - createIndex:
+            tableName: bids
+            indexName: idx_bids_task_status
+            columns:
+              - column: { name: task_id }
+              - column: { name: status }
+        - createIndex:
+            tableName: bids
+            indexName: idx_bids_executor_status
+            columns:
+              - column: { name: executor_id }
+              - column: { name: status }
