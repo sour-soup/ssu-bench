@@ -31,10 +31,16 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-restclient")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
+    // SpringDoc
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
+    // JWT
+    implementation("io.jsonwebtoken:jjwt-api:0.13.0")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.13.0")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.13.0")
+
     compileOnly("org.projectlombok:lombok")
     runtimeOnly("org.postgresql:postgresql")
     annotationProcessor("org.projectlombok:lombok")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
     testImplementation("org.springframework.boot:spring-boot-starter-data-jdbc-test")
     testImplementation("org.springframework.boot:spring-boot-starter-liquibase-test")
     testImplementation("org.springframework.boot:spring-boot-starter-restclient-test")
