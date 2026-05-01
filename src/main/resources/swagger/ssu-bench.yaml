@@ -434,11 +434,10 @@ components:
   schemas:
     RegisterRequest:
       type: object
-      required: [ email, password, role ]
+      required: [ username, password, role ]
       properties:
-        email:
+        username:
           type: string
-          format: email
         password:
           type: string
           minLength: 8
@@ -446,9 +445,9 @@ components:
           $ref: '#/components/schemas/RoleEnum'
     LoginRequest:
       type: object
-      required: [ email, password ]
+      required: [ username, password ]
       properties:
-        email:
+        username:
           type: string
         password:
           type: string
@@ -512,7 +511,7 @@ components:
       properties:
         id:
           type: integer
-        email:
+        username:
           type: string
         role:
           $ref: '#/components/schemas/RoleEnum'
