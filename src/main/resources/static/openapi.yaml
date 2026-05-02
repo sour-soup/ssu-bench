@@ -564,13 +564,7 @@ components:
       properties:
         page:
           type: integer
-          format: int64
         size:
-          type: integer
-          format: int64
-        totalElements:
-          type: integer
-        totalPages:
           type: integer
     ErrorResponse:
       type: object
