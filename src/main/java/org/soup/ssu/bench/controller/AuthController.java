@@ -1,10 +1,11 @@
 package org.soup.ssu.bench.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.soup.ssu.bench.feature.auth.login.LoginUseCase;
+import org.soup.ssu.bench.feature.auth.register.RegisterUseCase;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
-import org.soup.ssu.bench.feature.auth.register.RegisterUseCase;
 import ssu.bench.endpoint.AuthApi;
 import ssu.bench.model.AuthResponse;
 import ssu.bench.model.LoginRequest;
@@ -14,11 +15,13 @@ import ssu.bench.model.RegisterRequest;
 @RequiredArgsConstructor
 public class AuthController implements AuthApi {
 
+    private final LoginUseCase loginUseCase;
     private final RegisterUseCase registerUseCase;
 
     @Override
     public ResponseEntity<AuthResponse> postAuthLogin(LoginRequest loginRequest) {
-        return null;
+        AuthResponse response = loginUseCase.execute(loginRequest);
+        return ResponseEntity.ok(response);
     }
 
     @Override
