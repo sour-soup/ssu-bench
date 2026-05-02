@@ -63,7 +63,7 @@ sourceSets {
 
 openApiGenerate {
     generatorName.set("spring")
-    inputSpec.set("$rootDir/src/main/resources/swagger/ssu-bench.yaml")
+    inputSpec.set("$rootDir/src/main/resources/static/openapi.yaml")
     outputDir.set("${layout.buildDirectory.get().asFile}/generated")
     apiPackage.set("ssu.bench.endpoint")
     modelPackage.set("ssu.bench.model")

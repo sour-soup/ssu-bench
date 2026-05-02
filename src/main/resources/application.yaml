@@ -18,3 +18,13 @@ security:
     expiration: 3h
     issuer: ssu-bench
     secret: ${JWT_SECRET}
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    url: /openapi.yaml
+    operationsSorter: method
+    tagsSorter: alpha
