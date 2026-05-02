@@ -1,5 +1,7 @@
 package org.soup.ssu.bench.config;
 
+import org.soup.ssu.bench.security.CustomAccessDeniedHandler;
+import org.soup.ssu.bench.security.CustomAuthenticationEntryPoint;
 import org.soup.ssu.bench.security.JwtAuthenticationFilter;
 import org.soup.ssu.bench.security.JwtProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -43,14 +45,15 @@ public class SecurityConfig {
                                            CustomAccessDeniedHandler accessDeniedHandler) {
         security
             .csrf(AbstractHttpConfigurer::disable)
+            .formLogin(AbstractHttpConfigurer::disable)
             .sessionManagement(cfg -> cfg.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(registry -> registry
-                .requestMatchers(PUBLIC_PATHS).permitAll()
-                .anyRequest().authenticated()
-            )
             .exceptionHandling(cfg -> cfg
                 .authenticationEntryPoint(authEntryPoint)
                 .accessDeniedHandler(accessDeniedHandler)
+            )
+            .authorizeHttpRequests(registry -> registry
+                .requestMatchers(PUBLIC_PATHS).permitAll()
+                .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

@@ -1,4 +1,4 @@
-package org.soup.ssu.bench.config;
+package org.soup.ssu.bench.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;

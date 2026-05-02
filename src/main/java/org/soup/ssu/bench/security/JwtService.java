@@ -21,7 +21,7 @@ import java.util.Optional;
 public class JwtService {
 
     private static final String USERNAME_CLAIM = "username";
-    private static final String ROLE_CLAIM = "roles";
+    private static final String ROLE_CLAIM = "role";
 
     private final JwtProperties jwtProperties;
 
@@ -47,7 +47,7 @@ public class JwtService {
         Claims claims;
         try {
             claims = Jwts.parser()
-                .decryptWith(getSecretKey())
+                .verifyWith(getSecretKey())
                 .requireIssuer(jwtProperties.getIssuer())
                 .build()
                 .parseSignedClaims(token)
