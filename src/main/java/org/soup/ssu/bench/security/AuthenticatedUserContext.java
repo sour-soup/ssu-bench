@@ -14,6 +14,6 @@ public class AuthenticatedUserContext {
         return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
             .map(Authentication::getPrincipal)
             .map(AuthenticatedUser.class::cast)
-            .orElseThrow(UnauthorizedException::new);
+            .orElseThrow(() -> new UnauthorizedException("User is not authenticated"));
     }
 }
