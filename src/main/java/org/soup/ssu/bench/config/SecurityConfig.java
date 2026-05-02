@@ -38,13 +38,19 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity security,
-                                           JwtAuthenticationFilter jwtAuthenticationFilter) {
+                                           JwtAuthenticationFilter jwtAuthenticationFilter,
+                                           CustomAuthenticationEntryPoint authEntryPoint,
+                                           CustomAccessDeniedHandler accessDeniedHandler) {
         security
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(cfg -> cfg.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(registry -> registry
                 .requestMatchers(PUBLIC_PATHS).permitAll()
                 .anyRequest().authenticated()
+            )
+            .exceptionHandling(cfg -> cfg
+                .authenticationEntryPoint(authEntryPoint)
+                .accessDeniedHandler(accessDeniedHandler)
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
