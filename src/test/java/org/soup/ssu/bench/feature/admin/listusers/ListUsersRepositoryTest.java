@@ -11,9 +11,7 @@ import ssu.bench.model.RoleEnum;
 import ssu.bench.model.UserResponse;
 import ssu.bench.model.UserStatusEnum;
 
-import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,7 +27,6 @@ class ListUsersRepositoryTest extends RepositoryTest {
 
     @BeforeEach
     void setUp() {
-        cleanupUsers();
         insertTestUsers();
     }
 
@@ -54,16 +51,13 @@ class ListUsersRepositoryTest extends RepositoryTest {
         // Then
         assertThat(page0).hasSize(2);
         assertThat(page1).hasSize(1);
-        assertThat(page0.get(0).getId())
-            .isNotEqualTo(page1.get(0).getId());
+        assertThat(page0.getFirst().getId())
+            .isNotEqualTo(page1.getFirst().getId());
     }
 
     @Test
     @DisplayName("getUsers возвращает пустой список когда пользователей нет")
     void shouldReturnEmptyListWhenNoUsers() {
-        // Given
-        cleanupUsers();
-
         // When
         List<UserResponse> result = listUsersRepository.getUsers(0, 10);
 
@@ -118,10 +112,6 @@ class ListUsersRepositoryTest extends RepositoryTest {
 
         // Then
         assertThat(result).isEmpty();
-    }
-
-    private void cleanupUsers() {
-        jdbcTemplate.update("DELETE FROM users", new HashMap<>());
     }
 
     private void insertTestUsers() {
