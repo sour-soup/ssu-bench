@@ -131,29 +131,6 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-  /tasks/{taskId}/publish:
-    post:
-      operationId: postPublishTask
-      tags: [ Tasks ]
-      summary: Publish task
-      security:
-        - bearerAuth: [ CUSTOMER ]
-      parameters:
-        - $ref: '#/components/parameters/TaskId'
-      responses:
-        '200':
-          description: Task published
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TaskResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-
   /tasks/{taskId}/cancel:
     post:
       operationId: postCancelTask
@@ -588,7 +565,7 @@ components:
       enum: [ ACTIVE, BLOCKED ]
     TaskStatusEnum:
       type: string
-      enum: [ DRAFT, PUBLISHED, IN_PROGRESS, COMPLETED, CANCELLED ]
+      enum: [ PUBLISHED, IN_PROGRESS, COMPLETED, CANCELLED ]
     BidStatusEnum:
       type: string
       enum: [ PENDING, ACCEPTED, REJECTED ]
