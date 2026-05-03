@@ -1,0 +1,34 @@
+package org.soup.ssu.bench.repository.entity;
+
+import lombok.Builder;
+import lombok.With;
+import org.springframework.jdbc.core.RowMapper;
+
+import java.math.BigInteger;
+
+import static org.soup.ssu.bench.constant.CommonDataConstants.ID_COL;
+
+@With
+@Builder
+public record UserEntity(BigInteger id,
+                         String username,
+                         String passwordHash,
+                         String role,
+                         Integer balance,
+                         String status) {
+
+    public static final String USERNAME_COL = "username";
+    public static final String PASSWORD_HASH_COL = "password_hash";
+    public static final String ROLE_COL = "role";
+    public static final String BALANCE_COL = "balance";
+    public static final String STATUS_COL = "status";
+
+    public static final RowMapper<UserEntity> ROW_MAPPER = (rs, rowNum) -> UserEntity.builder()
+        .id(BigInteger.valueOf(rs.getLong(ID_COL)))
+        .username(rs.getString(USERNAME_COL))
+        .passwordHash(rs.getString(PASSWORD_HASH_COL))
+        .role(rs.getString(ROLE_COL))
+        .balance(rs.getInt(BALANCE_COL))
+        .status(rs.getString(STATUS_COL))
+        .build();
+}
