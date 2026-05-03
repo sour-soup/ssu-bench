@@ -13,6 +13,7 @@ tags:
   - name: Auth
   - name: Tasks
   - name: Bids
+  - name: Users
   - name: Admin
 
 paths:
@@ -381,6 +382,48 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
+  /users/me:
+    get:
+      operationId: getMyProfile
+      tags: [ Users ]
+      summary: Get my profile with balance
+      security:
+        - bearerAuth: [ CUSTOMER, EXECUTOR, ADMIN ]
+      responses:
+        '200':
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /users/deposit:
+    post:
+      operationId: postDeposit
+      tags: [ Users ]
+      summary: Deposit balance
+      security:
+        - bearerAuth: [ CUSTOMER, EXECUTOR, ADMIN ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepositRequest'
+      responses:
+        '200':
+          description: Balance updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -631,3 +674,12 @@ components:
     BidStatusEnum:
       type: string
       enum: [ PENDING, ACCEPTED, REJECTED ]
+    DepositRequest:
+      type: object
+      required: [ amount ]
+      properties:
+        amount:
+          type: integer
+          format: int64
+          minimum: 1
+          description: Amount to deposit
