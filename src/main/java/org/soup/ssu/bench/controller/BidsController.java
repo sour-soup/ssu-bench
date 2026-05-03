@@ -1,5 +1,9 @@
 package org.soup.ssu.bench.controller;
 
+import lombok.RequiredArgsConstructor;
+import org.soup.ssu.bench.feature.bids.accept.AcceptBidUseCase;
+import org.soup.ssu.bench.security.AuthenticatedUser;
+import org.soup.ssu.bench.security.AuthenticatedUserContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ssu.bench.endpoint.BidsApi;
@@ -9,7 +13,12 @@ import ssu.bench.model.PageBidResponse;
 import java.math.BigInteger;
 
 @RestController
+@RequiredArgsConstructor
 public class BidsController implements BidsApi {
+
+    private final AcceptBidUseCase acceptBidUseCase;
+    private final AuthenticatedUserContext userContext;
+
     @Override
     public ResponseEntity<PageBidResponse> getTaskBids(BigInteger taskId, Integer page, Integer size) {
         return null;
@@ -17,7 +26,9 @@ public class BidsController implements BidsApi {
 
     @Override
     public ResponseEntity<BidResponse> postAcceptBid(BigInteger bidId) {
-        return null;
+        AuthenticatedUser user = userContext.getAuthenticatedUser();
+        BidResponse response = acceptBidUseCase.execute(bidId, user.userId());
+        return ResponseEntity.ok(response);
     }
 
     @Override
