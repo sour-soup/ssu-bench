@@ -16,7 +16,7 @@ import static org.soup.ssu.bench.constant.CommonDataConstants.OFFSET_PARAM;
 import static org.soup.ssu.bench.repository.entity.UserEntity.BALANCE_COL;
 import static org.soup.ssu.bench.repository.entity.UserEntity.PASSWORD_HASH_COL;
 import static org.soup.ssu.bench.repository.entity.UserEntity.ROLE_COL;
-import static org.soup.ssu.bench.repository.entity.UserEntity.ROW_MAPPER;
+import static org.soup.ssu.bench.repository.entity.UserEntity.USER_ROW_MAPPER;
 import static org.soup.ssu.bench.repository.entity.UserEntity.STATUS_COL;
 import static org.soup.ssu.bench.repository.entity.UserEntity.USERNAME_COL;
 
@@ -62,7 +62,7 @@ public class UserRepository {
             .addValue(BALANCE_COL, userEntity.balance())
             .addValue(STATUS_COL, userEntity.status());
 
-        return jdbcTemplate.query(SQL_CREATE_USER, params, ROW_MAPPER)
+        return jdbcTemplate.query(SQL_CREATE_USER, params, USER_ROW_MAPPER)
             .getFirst();
     }
 
@@ -71,7 +71,7 @@ public class UserRepository {
             .addValue(ID_COL, id)
             .addValue(BALANCE_COL, balance);
 
-        return jdbcTemplate.query(SQL_UPDATE_BALANCE, params, ROW_MAPPER)
+        return jdbcTemplate.query(SQL_UPDATE_BALANCE, params, USER_ROW_MAPPER)
             .getFirst();
     }
 
@@ -80,7 +80,7 @@ public class UserRepository {
             .addValue(ID_COL, id)
             .addValue(STATUS_COL, status);
 
-        return jdbcTemplate.query(SQL_UPDATE_STATUS, params, ROW_MAPPER)
+        return jdbcTemplate.query(SQL_UPDATE_STATUS, params, USER_ROW_MAPPER)
             .getFirst();
     }
 
@@ -88,7 +88,7 @@ public class UserRepository {
         MapSqlParameterSource params = new MapSqlParameterSource()
             .addValue(ID_COL, id);
 
-        return jdbcTemplate.query(SQL_GET_USER, params, ROW_MAPPER).stream()
+        return jdbcTemplate.query(SQL_GET_USER, params, USER_ROW_MAPPER).stream()
             .findFirst();
     }
 
@@ -97,6 +97,6 @@ public class UserRepository {
             .addValue(LIMIT_PARAM, size)
             .addValue(OFFSET_PARAM, page * size);
 
-        return jdbcTemplate.query(SQL_GET_USERS, params, ROW_MAPPER);
+        return jdbcTemplate.query(SQL_GET_USERS, params, USER_ROW_MAPPER);
     }
 }

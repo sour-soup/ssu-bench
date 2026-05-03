@@ -23,7 +23,7 @@ public record UserEntity(BigInteger id,
     public static final String BALANCE_COL = "balance";
     public static final String STATUS_COL = "status";
 
-    public static final RowMapper<UserEntity> ROW_MAPPER = (rs, rowNum) -> UserEntity.builder()
+    public static final RowMapper<UserEntity> USER_ROW_MAPPER = (rs, rowNum) -> UserEntity.builder()
         .id(BigInteger.valueOf(rs.getLong(ID_COL)))
         .username(rs.getString(USERNAME_COL))
         .passwordHash(rs.getString(PASSWORD_HASH_COL))
