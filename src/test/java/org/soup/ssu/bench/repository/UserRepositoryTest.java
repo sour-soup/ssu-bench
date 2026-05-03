@@ -128,7 +128,7 @@ class UserRepositoryTest extends RepositoryTest {
         // then
         assertThat(result).isEmpty();
     }
-    
+
     private static UserEntity buildUserEntity() {
         return UserEntity.builder()
             .username("username")
