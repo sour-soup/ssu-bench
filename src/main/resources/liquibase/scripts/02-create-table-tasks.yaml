@@ -21,20 +21,6 @@ databaseChangeLog:
             tableName: tasks
             columnNames: id
             constraintName: pk_tasks
-        - addForeignKeyConstraint:
-            constraintName: fk_tasks_customer_id
-            baseTableName: tasks
-            baseColumnNames: customer_id
-            referencedTableName: users
-            referencedColumnNames: id
-            onDelete: RESTRICT
-        - addForeignKeyConstraint:
-            constraintName: fk_tasks_executor_id
-            baseTableName: tasks
-            baseColumnNames: executor_id
-            referencedTableName: users
-            referencedColumnNames: id
-            onDelete: SET NULL
         - createIndex:
             tableName: tasks
             indexName: idx_tasks_customer

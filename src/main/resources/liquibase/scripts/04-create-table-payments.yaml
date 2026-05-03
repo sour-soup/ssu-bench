@@ -19,27 +19,6 @@ databaseChangeLog:
             tableName: payments
             columnNames: id
             constraintName: pk_payments
-        - addForeignKeyConstraint:
-            constraintName: fk_payments_task_id
-            baseTableName: payments
-            baseColumnNames: task_id
-            referencedTableName: tasks
-            referencedColumnNames: id
-            onDelete: RESTRICT
-        - addForeignKeyConstraint:
-            constraintName: fk_payments_customer_id
-            baseTableName: payments
-            baseColumnNames: customer_id
-            referencedTableName: users
-            referencedColumnNames: id
-            onDelete: RESTRICT
-        - addForeignKeyConstraint:
-            constraintName: fk_payments_executor_id
-            baseTableName: payments
-            baseColumnNames: executor_id
-            referencedTableName: users
-            referencedColumnNames: id
-            onDelete: RESTRICT
         - sql:
             splitStatements: false
             sql: ALTER TABLE payments ADD CONSTRAINT ck_payments_amount CHECK (amount > 0);

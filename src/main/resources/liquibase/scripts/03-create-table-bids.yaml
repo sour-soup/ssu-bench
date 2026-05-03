@@ -18,20 +18,6 @@ databaseChangeLog:
             tableName: bids
             columnNames: id
             constraintName: pk_bids
-        - addForeignKeyConstraint:
-            constraintName: fk_bids_task_id
-            baseTableName: bids
-            baseColumnNames: task_id
-            referencedTableName: tasks
-            referencedColumnNames: id
-            onDelete: CASCADE
-        - addForeignKeyConstraint:
-            constraintName: fk_bids_executor_id
-            baseTableName: bids
-            baseColumnNames: executor_id
-            referencedTableName: users
-            referencedColumnNames: id
-            onDelete: RESTRICT
         - addUniqueConstraint:
             tableName: bids
             columnNames: task_id, executor_id
