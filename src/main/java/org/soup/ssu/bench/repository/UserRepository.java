@@ -7,15 +7,12 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.soup.ssu.bench.constant.CommonDataConstants.CREATED_AT_COL;
 import static org.soup.ssu.bench.constant.CommonDataConstants.ID_COL;
 import static org.soup.ssu.bench.constant.CommonDataConstants.LIMIT_PARAM;
 import static org.soup.ssu.bench.constant.CommonDataConstants.OFFSET_PARAM;
-import static org.soup.ssu.bench.constant.CommonDataConstants.UPDATED_AT_COL;
 import static org.soup.ssu.bench.repository.entity.UserEntity.BALANCE_COL;
 import static org.soup.ssu.bench.repository.entity.UserEntity.PASSWORD_HASH_COL;
 import static org.soup.ssu.bench.repository.entity.UserEntity.ROLE_COL;
@@ -29,18 +26,18 @@ public class UserRepository {
 
     private static final String SQL_CREATE_USER = """
             INSERT INTO users (username, password_hash, role, balance, status, created_at, updated_at)
-            VALUES (:username, :password_hash, :role, :balance, :status, :created_at, :updated_at)
+            VALUES (:username, :password_hash, :role, :balance, :status, now(), now())
             RETURNING id, username, password_hash, role, balance, status
         """;
 
     private static final String SQL_UPDATE_BALANCE = """
-            UPDATE users SET balance = :balance, updated_at = :updated_at
+            UPDATE users SET balance = :balance, updated_at = now()
             WHERE id = :id
             RETURNING id, username, password_hash, role, balance, status
         """;
 
     private static final String SQL_UPDATE_STATUS = """
-            UPDATE users SET status = :status, updated_at = :updated_at
+            UPDATE users SET status = :status, updated_at = now()
             WHERE id = :id
             RETURNING id, username, password_hash, role, balance, status
         """;
@@ -63,9 +60,7 @@ public class UserRepository {
             .addValue(PASSWORD_HASH_COL, userEntity.passwordHash())
             .addValue(ROLE_COL, userEntity.role())
             .addValue(BALANCE_COL, userEntity.balance())
-            .addValue(STATUS_COL, userEntity.status())
-            .addValue(CREATED_AT_COL, LocalDateTime.now())
-            .addValue(UPDATED_AT_COL, LocalDateTime.now());
+            .addValue(STATUS_COL, userEntity.status());
 
         return jdbcTemplate.query(SQL_CREATE_USER, params, ROW_MAPPER)
             .getFirst();
@@ -74,8 +69,7 @@ public class UserRepository {
     public UserEntity updateBalance(BigInteger id, int balance) {
         MapSqlParameterSource params = new MapSqlParameterSource()
             .addValue(ID_COL, id)
-            .addValue(BALANCE_COL, balance)
-            .addValue(UPDATED_AT_COL, LocalDateTime.now());
+            .addValue(BALANCE_COL, balance);
 
         return jdbcTemplate.query(SQL_UPDATE_BALANCE, params, ROW_MAPPER)
             .getFirst();
@@ -84,8 +78,7 @@ public class UserRepository {
     public UserEntity updateStatus(BigInteger id, String status) {
         MapSqlParameterSource params = new MapSqlParameterSource()
             .addValue(ID_COL, id)
-            .addValue(STATUS_COL, status)
-            .addValue(UPDATED_AT_COL, LocalDateTime.now());
+            .addValue(STATUS_COL, status);
 
         return jdbcTemplate.query(SQL_UPDATE_STATUS, params, ROW_MAPPER)
             .getFirst();

@@ -14,7 +14,7 @@ public record UserEntity(BigInteger id,
                          String username,
                          String passwordHash,
                          String role,
-                         Integer balance,
+                         BigInteger balance,
                          String status) {
 
     public static final String USERNAME_COL = "username";
@@ -28,7 +28,7 @@ public record UserEntity(BigInteger id,
         .username(rs.getString(USERNAME_COL))
         .passwordHash(rs.getString(PASSWORD_HASH_COL))
         .role(rs.getString(ROLE_COL))
-        .balance(rs.getInt(BALANCE_COL))
+        .balance(BigInteger.valueOf(rs.getLong(BALANCE_COL)))
         .status(rs.getString(STATUS_COL))
         .build();
 }
