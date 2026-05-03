@@ -13,12 +13,12 @@ import java.util.Optional;
 import static org.soup.ssu.bench.constant.CommonDataConstants.ID_COL;
 import static org.soup.ssu.bench.constant.CommonDataConstants.LIMIT_PARAM;
 import static org.soup.ssu.bench.constant.CommonDataConstants.OFFSET_PARAM;
+import static org.soup.ssu.bench.constant.CommonDataConstants.STATUS_COL;
 import static org.soup.ssu.bench.repository.entity.UserEntity.BALANCE_COL;
 import static org.soup.ssu.bench.repository.entity.UserEntity.PASSWORD_HASH_COL;
 import static org.soup.ssu.bench.repository.entity.UserEntity.ROLE_COL;
-import static org.soup.ssu.bench.repository.entity.UserEntity.USER_ROW_MAPPER;
-import static org.soup.ssu.bench.repository.entity.UserEntity.STATUS_COL;
 import static org.soup.ssu.bench.repository.entity.UserEntity.USERNAME_COL;
+import static org.soup.ssu.bench.repository.entity.UserEntity.USER_ROW_MAPPER;
 
 @Repository
 @RequiredArgsConstructor
@@ -66,7 +66,7 @@ public class UserRepository {
             .getFirst();
     }
 
-    public UserEntity updateBalance(BigInteger id, int balance) {
+    public UserEntity updateBalance(BigInteger id, BigInteger balance) {
         MapSqlParameterSource params = new MapSqlParameterSource()
             .addValue(ID_COL, id)
             .addValue(BALANCE_COL, balance);

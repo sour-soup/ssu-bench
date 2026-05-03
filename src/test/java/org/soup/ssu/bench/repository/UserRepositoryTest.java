@@ -36,7 +36,7 @@ class UserRepositoryTest extends RepositoryTest {
     @Test
     void givenUserInDb_whenUpdateBalance_thenReturnUpdatedUser() {
         // given
-        int newBalance = 197;
+        BigInteger newBalance = BigInteger.valueOf(1334);
         UserEntity userEntity = userRepository.createUser(buildUserEntity());
 
         // when
@@ -128,14 +128,13 @@ class UserRepositoryTest extends RepositoryTest {
         // then
         assertThat(result).isEmpty();
     }
-
-
+    
     private static UserEntity buildUserEntity() {
         return UserEntity.builder()
             .username("username")
             .passwordHash("password_hash")
             .role("role")
-            .balance(137)
+            .balance(BigInteger.valueOf(137))
             .status("status")
             .build();
     }
