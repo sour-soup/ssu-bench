@@ -10,6 +10,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 import ssu.bench.model.ErrorResponse;
+import ssu.bench.model.ErrorStatusEnum;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -29,8 +30,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
         ErrorResponse errorResponse = new ErrorResponse()
-            .status(401)
-            .error("Unauthorized")
+            .status(ErrorStatusEnum.UNAUTHORIZED)
             .message("Authentication required")
             .timestamp(LocalDateTime.now());
 

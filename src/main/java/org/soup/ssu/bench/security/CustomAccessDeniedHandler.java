@@ -10,6 +10,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 import ssu.bench.model.ErrorResponse;
+import ssu.bench.model.ErrorStatusEnum;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -24,16 +25,15 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     public void handle(@NonNull HttpServletRequest request,
                        HttpServletResponse response,
                        @NonNull AccessDeniedException accessDeniedException) throws IOException {
-        
+
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        
+
         ErrorResponse errorResponse = new ErrorResponse()
-            .status(403)
-            .error("Forbidden")
+            .status(ErrorStatusEnum.FORBIDDEN)
             .message("Access is denied")
             .timestamp(LocalDateTime.now());
-        
+
         objectMapper.writeValue(response.getOutputStream(), errorResponse);
     }
 }

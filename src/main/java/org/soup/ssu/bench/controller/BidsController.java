@@ -20,8 +20,19 @@ public class BidsController implements BidsApi {
     private final AuthenticatedUserContext userContext;
 
     @Override
+    public ResponseEntity<BidResponse> getBidById(BigInteger bidId) {
+        return ResponseEntity.ok().build();
+    }
+
+    @Override
+    public ResponseEntity<PageBidResponse> getMyBids(Integer page, Integer size) {
+        AuthenticatedUser user = userContext.getAuthenticatedUser();
+        return ResponseEntity.ok().build();
+    }
+
+    @Override
     public ResponseEntity<PageBidResponse> getTaskBids(BigInteger taskId, Integer page, Integer size) {
-        return null;
+        return ResponseEntity.ok().build();
     }
 
     @Override
@@ -33,6 +44,6 @@ public class BidsController implements BidsApi {
 
     @Override
     public ResponseEntity<BidResponse> postCreateBid(BigInteger taskId) {
-        return null;
+        return ResponseEntity.ok().build();
     }
 }
