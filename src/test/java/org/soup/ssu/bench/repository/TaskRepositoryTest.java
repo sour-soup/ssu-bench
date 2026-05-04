@@ -73,7 +73,7 @@ public class TaskRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    void givenEmptyDb_whenGetTaskByUd_thenReturnEmpty() {
+    void givenEmptyDb_whenGetTaskById_thenReturnEmpty() {
         // when
         Optional<TaskEntity> result = taskRepository.getTaskById(BigInteger.valueOf(999));
 

@@ -60,7 +60,7 @@ public class BidRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    void givenEmptyDb_whenGetBidByUd_thenReturnEmpty() {
+    void givenEmptyDb_whenGetBidById_thenReturnEmpty() {
         // when
         Optional<BidEntity> result = bidRepository.getBidById(BigInteger.valueOf(999));
 

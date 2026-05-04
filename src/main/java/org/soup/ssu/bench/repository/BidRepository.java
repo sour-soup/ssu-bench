@@ -34,13 +34,13 @@ public class BidRepository {
         """;
 
     private static final String SQL_GET_BID = """
-            SELECT id, status, task_id, executor_id, created_at, updated_at
+            SELECT id, status, task_id, executor_id
             FROM bids
             WHERE id = :id
         """;
 
     private static final String SQL_GET_BIDS = """
-            SELECT id, status, task_id, executor_id, created_at, updated_at
+            SELECT id, status, task_id, executor_id
             FROM bids
             ORDER BY created_at DESC LIMIT :limit OFFSET :offset
         """;
@@ -52,8 +52,7 @@ public class BidRepository {
             .addValue(STATUS_COL, bidEntity.status())
             .addValue(TASK_ID_COL, bidEntity.taskId());
 
-        return jdbcTemplate.query(SQL_CREATE_BID, params, BID_ROW_MAPPER)
-            .getFirst();
+        return jdbcTemplate.queryForObject(SQL_CREATE_BID, params, BID_ROW_MAPPER);
     }
 
     public BidEntity updateStatus(BigInteger id, String status) {
@@ -61,8 +60,7 @@ public class BidRepository {
             .addValue(ID_COL, id)
             .addValue(STATUS_COL, status);
 
-        return jdbcTemplate.query(SQL_UPDATE_STATUS, params, BID_ROW_MAPPER)
-            .getFirst();
+        return jdbcTemplate.queryForObject(SQL_UPDATE_STATUS, params, BID_ROW_MAPPER);
     }
 
     public Optional<BidEntity> getBidById(BigInteger id) {

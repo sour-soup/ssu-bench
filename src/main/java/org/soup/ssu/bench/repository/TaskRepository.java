@@ -44,13 +44,13 @@ public class TaskRepository {
         """;
 
     private static final String SQL_GET_TASK = """
-            SELECT id, title, description, reward, status, customer_id, executor_id, created_at, updated_at
+            SELECT id, title, description, reward, status, customer_id, executor_id
             FROM tasks
             WHERE id = :id
         """;
 
     private static final String SQL_GET_TASKS = """
-            SELECT id, title, description, reward, status, customer_id, executor_id, created_at, updated_at
+            SELECT id, title, description, reward, status, customer_id, executor_id
             FROM tasks
             ORDER BY created_at DESC LIMIT :limit OFFSET :offset
         """;
@@ -65,8 +65,7 @@ public class TaskRepository {
             .addValue(STATUS_COL, taskEntity.status())
             .addValue(CUSTOMER_ID_COL, taskEntity.customerId());
 
-        return jdbcTemplate.query(SQL_CREATE_TASK, params, TASK_ROW_MAPPER)
-            .getFirst();
+        return jdbcTemplate.queryForObject(SQL_CREATE_TASK, params, TASK_ROW_MAPPER);
     }
 
     public TaskEntity updateExecutor(BigInteger id, BigInteger executorId) {
@@ -74,8 +73,7 @@ public class TaskRepository {
             .addValue(ID_COL, id)
             .addValue(EXECUTOR_ID_COL, executorId);
 
-        return jdbcTemplate.query(SQL_UPDATE_EXECUTOR, params, TASK_ROW_MAPPER)
-            .getFirst();
+        return jdbcTemplate.queryForObject(SQL_UPDATE_EXECUTOR, params, TASK_ROW_MAPPER);
     }
 
     public TaskEntity updateStatus(BigInteger id, String status) {
@@ -83,8 +81,7 @@ public class TaskRepository {
             .addValue(ID_COL, id)
             .addValue(STATUS_COL, status);
 
-        return jdbcTemplate.query(SQL_UPDATE_STATUS, params, TASK_ROW_MAPPER)
-            .getFirst();
+        return jdbcTemplate.queryForObject(SQL_UPDATE_STATUS, params, TASK_ROW_MAPPER);
     }
 
     public Optional<TaskEntity> getTaskById(BigInteger id) {

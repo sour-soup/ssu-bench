@@ -11,9 +11,9 @@ databaseChangeLog:
               - column: { name: id, type: BIGINT, autoIncrement: true, remarks: "PK" }
               - column: { name: task_id, type: BIGINT, remarks: "Target task" }
               - column: { name: executor_id, type: BIGINT, remarks: "Executor who placed bid" }
-              - column: { name: status, type: VARCHAR(32), defaultValue: "PENDING", remarks: "PENDING, ACCEPTED, REJECTED" }
-              - column: { name: created_at, type: TIMESTAMP, defaultValueComputed: "CURRENT_TIMESTAMP" }
-              - column: { name: updated_at, type: TIMESTAMP, defaultValueComputed: "CURRENT_TIMESTAMP" }
+              - column: { name: status, type: VARCHAR(32), remarks: "PENDING, ACCEPTED, REJECTED" }
+              - column: { name: created_at, type: TIMESTAMP, remarks: "Creation time" }
+              - column: { name: updated_at, type: TIMESTAMP, remarks: "Last update time" }
         - addPrimaryKey:
             tableName: bids
             columnNames: id

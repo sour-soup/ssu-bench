@@ -17,8 +17,8 @@ import static org.soup.ssu.bench.repository.entity.PaymentEntity.TYPE_COL;
 public class PaymentRepository {
 
     private static final String SQL_CREATE_PAYMENT = """
-            INSERT INTO payments (task_id, type, sender_id, receiver_id, created_at)
-            VALUES(:task_id, :type, :sender_id, :receiver_id, now())
+            INSERT INTO payments (task_id, type, sender_id, receiver_id, created_at, updated_at)
+            VALUES(:task_id, :type, :sender_id, :receiver_id, now(), now())
             RETURNING id, task_id, type, sender_id, receiver_id;
         """;
 

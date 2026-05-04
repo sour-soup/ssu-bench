@@ -42,9 +42,14 @@ public class UserRepository {
             RETURNING id, username, password_hash, role, balance, status
         """;
 
-    private static final String SQL_GET_USER = """
+    private static final String SQL_GET_USER_BY_ID = """
             SELECT id, username, password_hash, role, balance, status FROM users
             WHERE id = :id
+        """;
+
+    private static final String SQL_GET_USER_BY_USERNAME = """
+            SELECT id, username, password_hash, role, balance, status FROM users
+            WHERE username = :username
         """;
 
     private static final String SQL_GET_USERS = """
@@ -62,8 +67,7 @@ public class UserRepository {
             .addValue(BALANCE_COL, userEntity.balance())
             .addValue(STATUS_COL, userEntity.status());
 
-        return jdbcTemplate.query(SQL_CREATE_USER, params, USER_ROW_MAPPER)
-            .getFirst();
+        return jdbcTemplate.queryForObject(SQL_CREATE_USER, params, USER_ROW_MAPPER);
     }
 
     public UserEntity updateBalance(BigInteger id, BigInteger balance) {
@@ -71,8 +75,7 @@ public class UserRepository {
             .addValue(ID_COL, id)
             .addValue(BALANCE_COL, balance);
 
-        return jdbcTemplate.query(SQL_UPDATE_BALANCE, params, USER_ROW_MAPPER)
-            .getFirst();
+        return jdbcTemplate.queryForObject(SQL_UPDATE_BALANCE, params, USER_ROW_MAPPER);
     }
 
     public UserEntity updateStatus(BigInteger id, String status) {
@@ -88,7 +91,15 @@ public class UserRepository {
         MapSqlParameterSource params = new MapSqlParameterSource()
             .addValue(ID_COL, id);
 
-        return jdbcTemplate.query(SQL_GET_USER, params, USER_ROW_MAPPER).stream()
+        return jdbcTemplate.query(SQL_GET_USER_BY_ID, params, USER_ROW_MAPPER).stream()
+            .findFirst();
+    }
+
+    public Optional<UserEntity> getUserByUsername(String username) {
+        MapSqlParameterSource params = new MapSqlParameterSource()
+            .addValue(USERNAME_COL, username);
+
+        return jdbcTemplate.query(SQL_GET_USER_BY_USERNAME, params, USER_ROW_MAPPER).stream()
             .findFirst();
     }
 

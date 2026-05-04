@@ -14,7 +14,8 @@ databaseChangeLog:
               - column: { name: receiver_id, type: BIGINT, remarks: "Payee (executor)" }
               - column: { name: amount, type: BIGINT, remarks: "Amount in soups" }
               - column: { name: type, type: VARCHAR(32), remarks: "HOLD, RELEASE, PAYMENT" }
-              - column: { name: created_at, type: TIMESTAMP, defaultValueComputed: "CURRENT_TIMESTAMP" }
+              - column: { name: created_at, type: TIMESTAMP, remarks: "Creation time" }
+              - column: { name: updated_at, type: TIMESTAMP, remarks: "Last update time" }
         - addPrimaryKey:
             tableName: payments
             columnNames: id

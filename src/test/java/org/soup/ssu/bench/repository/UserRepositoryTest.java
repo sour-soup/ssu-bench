@@ -72,9 +72,30 @@ class UserRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    void givenEmptyDb_whenGetUserByUd_thenReturnEmpty() {
+    void givenEmptyDb_whenGetUserById_thenReturnEmpty() {
         // when
         Optional<UserEntity> result = userRepository.getUserById(BigInteger.valueOf(999));
+
+        // then
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void givenUserInDb_whenGetUserByUsername_thenReturnUser() {
+        // given
+        UserEntity userEntity = userRepository.createUser(buildUserEntity());
+
+        // when
+        Optional<UserEntity> result = userRepository.getUserByUsername(userEntity.username());
+
+        // then
+        assertThat(result).get().isEqualTo(userEntity);
+    }
+
+    @Test
+    void givenEmptyDb_whenGetUserByUsername_thenReturnEmpty() {
+        // when
+        Optional<UserEntity> result = userRepository.getUserByUsername("user");
 
         // then
         assertThat(result).isEmpty();
