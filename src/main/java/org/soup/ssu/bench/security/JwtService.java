@@ -6,7 +6,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ssu.bench.model.RoleEnum;
 
 import javax.crypto.SecretKey;
 import java.math.BigInteger;
