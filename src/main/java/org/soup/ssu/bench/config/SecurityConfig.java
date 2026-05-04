@@ -1,9 +1,9 @@
 package org.soup.ssu.bench.config;
 
-import org.soup.ssu.bench.security.CustomAccessDeniedHandler;
-import org.soup.ssu.bench.security.CustomAuthenticationEntryPoint;
-import org.soup.ssu.bench.security.JwtAuthenticationFilter;
-import org.soup.ssu.bench.security.JwtProperties;
+import org.soup.ssu.bench.config.security.CustomAccessDeniedHandler;
+import org.soup.ssu.bench.config.security.CustomAuthenticationEntryPoint;
+import org.soup.ssu.bench.config.security.JwtAuthenticationFilter;
+import org.soup.ssu.bench.config.security.JwtProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
