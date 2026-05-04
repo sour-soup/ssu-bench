@@ -1,7 +1,6 @@
 package org.soup.ssu.bench.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.soup.ssu.bench.feature.bids.accept.AcceptBidUseCase;
 import org.soup.ssu.bench.security.AuthenticatedUser;
 import org.soup.ssu.bench.security.AuthenticatedUserContext;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +15,6 @@ import java.math.BigInteger;
 @RequiredArgsConstructor
 public class BidsController implements BidsApi {
 
-    private final AcceptBidUseCase acceptBidUseCase;
     private final AuthenticatedUserContext userContext;
 
     @Override
@@ -38,8 +36,7 @@ public class BidsController implements BidsApi {
     @Override
     public ResponseEntity<BidResponse> postAcceptBid(BigInteger bidId) {
         AuthenticatedUser user = userContext.getAuthenticatedUser();
-        BidResponse response = acceptBidUseCase.execute(bidId, user.userId());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok().build();
     }
 
     @Override
