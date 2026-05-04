@@ -10,8 +10,8 @@ databaseChangeLog:
             columns:
               - column: { name: id, type: BIGINT, autoIncrement: true, remarks: "PK" }
               - column: { name: task_id, type: BIGINT, remarks: "Related task" }
-              - column: { name: customer_id, type: BIGINT, remarks: "Payer (customer)" }
-              - column: { name: executor_id, type: BIGINT, remarks: "Payee (executor)" }
+              - column: { name: sender_id, type: BIGINT, remarks: "Payer (customer)" }
+              - column: { name: receiver_id, type: BIGINT, remarks: "Payee (executor)" }
               - column: { name: amount, type: BIGINT, remarks: "Amount in soups" }
               - column: { name: type, type: VARCHAR(32), remarks: "HOLD, RELEASE, PAYMENT" }
               - column: { name: created_at, type: TIMESTAMP, defaultValueComputed: "CURRENT_TIMESTAMP" }
@@ -29,11 +29,11 @@ databaseChangeLog:
               - column: { name: task_id }
         - createIndex:
             tableName: payments
-            indexName: idx_payments_customer_id
+            indexName: idx_payments_sender_id
             columns:
-              - column: { name: customer_id }
+              - column: { name: sender_id }
         - createIndex:
             tableName: payments
-            indexName: idx_payments_executor_id
+            indexName: idx_payments_receiver_id
             columns:
-              - column: { name: executor_id }
+              - column: { name: receiver_id }
