@@ -25,7 +25,7 @@ public class JwtService {
 
     private final JwtProperties jwtProperties;
 
-    public String createToken(String username, BigInteger userId, RoleEnum role) {
+    public String createToken(String username, BigInteger userId, String role) {
         Map<String, Object> claims = Map.of(
             USERNAME_CLAIM, username,
             ROLE_CLAIM, role
