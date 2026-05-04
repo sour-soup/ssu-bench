@@ -39,7 +39,7 @@ public class EntityGenerator {
         return BidEntity.builder()
             .status(BidStatusEnum.PENDING.getValue())
             .taskId(TASK_ID)
-            .executorId(CUSTOMER_ID)
+            .executorId(EXECUTOR_ID)
             .createdAt(LocalDateTime.now())
             .build();
     }

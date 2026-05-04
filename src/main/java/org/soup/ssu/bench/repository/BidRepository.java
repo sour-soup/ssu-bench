@@ -15,6 +15,7 @@ import static org.soup.ssu.bench.constant.CommonDataConstants.LIMIT_PARAM;
 import static org.soup.ssu.bench.constant.CommonDataConstants.OFFSET_PARAM;
 import static org.soup.ssu.bench.constant.CommonDataConstants.STATUS_COL;
 import static org.soup.ssu.bench.repository.entity.BidEntity.BID_ROW_MAPPER;
+import static org.soup.ssu.bench.repository.entity.BidEntity.EXECUTOR_ID_COL;
 import static org.soup.ssu.bench.repository.entity.BidEntity.TASK_ID_COL;
 
 @Repository
@@ -22,8 +23,8 @@ import static org.soup.ssu.bench.repository.entity.BidEntity.TASK_ID_COL;
 public class BidRepository {
 
     private static final String SQL_CREATE_BID = """
-            INSERT INTO bids (status, task_id, created_at, updated_at)
-            VALUES(:status, :task_id, now(), now())
+            INSERT INTO bids (status, task_id, executor_id, created_at, updated_at)
+            VALUES(:status, :task_id, :executor_id, now(), now())
             RETURNING id, status, task_id, executor_id, created_at;
         """;
 
@@ -50,7 +51,8 @@ public class BidRepository {
     public BidEntity createBid(BidEntity bidEntity) {
         MapSqlParameterSource params = new MapSqlParameterSource()
             .addValue(STATUS_COL, bidEntity.status())
-            .addValue(TASK_ID_COL, bidEntity.taskId());
+            .addValue(TASK_ID_COL, bidEntity.taskId())
+            .addValue(EXECUTOR_ID_COL, bidEntity.executorId());
 
         return jdbcTemplate.queryForObject(SQL_CREATE_BID, params, BID_ROW_MAPPER);
     }

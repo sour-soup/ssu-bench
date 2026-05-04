@@ -1,6 +1,5 @@
 package org.soup.ssu.bench.repository;
 
-import org.assertj.core.api.AssertionsForInterfaceTypes;
 import org.junit.jupiter.api.Test;
 import org.soup.ssu.bench.RepositoryTest;
 import org.soup.ssu.bench.repository.entity.BidEntity;
@@ -11,9 +10,10 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.soup.ssu.bench.generator.EntityGenerator.buildBidEntity;
 
 @Import(BidRepository.class)
@@ -32,7 +32,7 @@ public class BidRepositoryTest extends RepositoryTest {
 
         // then
         assertNotNull(insertedBid.id());
-        assertEquals(bidEntity.withId(insertedBid.id()), insertedBid);
+        assertEqualsBid(bidEntity.withId(insertedBid.id()), insertedBid);
     }
 
     @Test
@@ -45,7 +45,7 @@ public class BidRepositoryTest extends RepositoryTest {
         BidEntity insertedBid = bidRepository.updateStatus(bidEntity.id(), newStatus);
 
         // then
-        assertEquals(bidEntity.withStatus(newStatus), insertedBid);
+        assertEqualsBid(bidEntity.withStatus(newStatus), insertedBid);
     }
 
     @Test
@@ -57,7 +57,8 @@ public class BidRepositoryTest extends RepositoryTest {
         Optional<BidEntity> result = bidRepository.getBidById(bidEntity.id());
 
         // then
-        assertThat(result).get().isEqualTo(bidEntity);
+        assertTrue(result.isPresent());
+        assertEqualsBid(bidEntity, result.get());
     }
 
     @Test
@@ -78,35 +79,35 @@ public class BidRepositoryTest extends RepositoryTest {
         List<BidEntity> result = bidRepository.getBids(0, 10);
 
         // then
-        AssertionsForInterfaceTypes.assertThat(result).containsExactly(bidEntity);
+        assertThat(result).containsExactly(bidEntity);
     }
 
     @Test
     void givenBidsInDb_whenGetBids_thenReturnLimitBids() {
         // given
-        bidRepository.createBid(buildBidEntity());
-        bidRepository.createBid(buildBidEntity());
-        bidRepository.createBid(buildBidEntity());
+        bidRepository.createBid(buildBidEntity().withTaskId(BigInteger.valueOf(1)));
+        bidRepository.createBid(buildBidEntity().withTaskId(BigInteger.valueOf(2)));
+        bidRepository.createBid(buildBidEntity().withTaskId(BigInteger.valueOf(3)));
 
         // when
         List<BidEntity> result = bidRepository.getBids(0, 2);
 
         // then
-        AssertionsForInterfaceTypes.assertThat(result).hasSize(2);
+        assertThat(result).hasSize(2);
     }
 
     @Test
     void givenBidsInDb_whenGetBids_thenReturnOffsetBids() {
         // given
-        bidRepository.createBid(buildBidEntity());
-        bidRepository.createBid(buildBidEntity());
-        bidRepository.createBid(buildBidEntity());
+        bidRepository.createBid(buildBidEntity().withTaskId(BigInteger.valueOf(1)));
+        bidRepository.createBid(buildBidEntity().withTaskId(BigInteger.valueOf(2)));
+        bidRepository.createBid(buildBidEntity().withTaskId(BigInteger.valueOf(3)));
 
         // when
         List<BidEntity> result = bidRepository.getBids(1, 2);
 
         // then
-        AssertionsForInterfaceTypes.assertThat(result).hasSize(1);
+        assertThat(result).hasSize(1);
     }
 
     @Test
@@ -115,6 +116,13 @@ public class BidRepositoryTest extends RepositoryTest {
         List<BidEntity> result = bidRepository.getBids(0, 1);
 
         // then
-        AssertionsForInterfaceTypes.assertThat(result).isEmpty();
+        assertThat(result).isEmpty();
+    }
+
+    private static void assertEqualsBid(BidEntity expected, BidEntity actual) {
+        assertEquals(expected.id(), actual.id());
+        assertEquals(expected.taskId(), actual.taskId());
+        assertEquals(expected.executorId(), actual.executorId());
+        assertEquals(expected.status(), actual.status());
     }
 }

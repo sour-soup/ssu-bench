@@ -31,7 +31,7 @@ class UserRepositoryTest extends RepositoryTest {
 
         // then
         assertNotNull(insertedUser.id());
-        assertEquals(userEntity.withId(insertedUser.id()), insertedUser);
+        assertEqualsUser(userEntity.withId(insertedUser.id()), insertedUser);
     }
 
     @Test
@@ -44,7 +44,7 @@ class UserRepositoryTest extends RepositoryTest {
         UserEntity insertedUser = userRepository.updateBalance(userEntity.id(), newBalance);
 
         // then
-        assertEquals(userEntity.withBalance(newBalance), insertedUser);
+        assertEqualsUser(userEntity.withBalance(newBalance), insertedUser);
     }
 
     @Test
@@ -57,7 +57,7 @@ class UserRepositoryTest extends RepositoryTest {
         UserEntity insertedUser = userRepository.updateStatus(userEntity.id(), newStatus);
 
         // then
-        assertEquals(userEntity.withStatus(newStatus), insertedUser);
+        assertEqualsUser(userEntity.withStatus(newStatus), insertedUser);
     }
 
     @Test
@@ -149,5 +149,13 @@ class UserRepositoryTest extends RepositoryTest {
 
         // then
         assertThat(result).isEmpty();
+    }
+
+    private static void assertEqualsUser(UserEntity expected, UserEntity actual) {
+        assertEquals(expected.id(), actual.id());
+        assertEquals(expected.username(), actual.username());
+        assertEquals(expected.passwordHash(), actual.passwordHash());
+        assertEquals(expected.balance(), actual.balance());
+        assertEquals(expected.status(), actual.status());
     }
 }

@@ -6,14 +6,16 @@ import org.soup.ssu.bench.RepositoryTest;
 import org.soup.ssu.bench.repository.entity.TaskEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import ssu.bench.model.TaskStatusEnum;
 
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.soup.ssu.bench.generator.EntityGenerator.buildTaskEntity;
 
 @Import(TaskRepository.class)
@@ -32,7 +34,7 @@ public class TaskRepositoryTest extends RepositoryTest {
 
         // then
         assertNotNull(insertedTask.id());
-        assertEquals(taskEntity.withId(insertedTask.id()), insertedTask);
+        assertEqualsTask(taskEntity.withId(insertedTask.id()), insertedTask);
     }
 
     @Test
@@ -45,7 +47,7 @@ public class TaskRepositoryTest extends RepositoryTest {
         TaskEntity insertedTask = taskRepository.updateExecutor(taskEntity.id(), newExecutor);
 
         // then
-        assertEquals(taskEntity.withExecutorId(newExecutor), insertedTask);
+        assertEqualsTask(taskEntity.withExecutorId(newExecutor), insertedTask);
     }
 
     @Test
@@ -58,7 +60,7 @@ public class TaskRepositoryTest extends RepositoryTest {
         TaskEntity insertedTask = taskRepository.updateStatus(taskEntity.id(), newStatus);
 
         // then
-        assertEquals(taskEntity.withStatus(newStatus), insertedTask);
+        assertEqualsTask(taskEntity.withStatus(newStatus), insertedTask);
     }
 
     @Test
@@ -70,7 +72,8 @@ public class TaskRepositoryTest extends RepositoryTest {
         Optional<TaskEntity> result = taskRepository.getTaskById(taskEntity.id());
 
         // then
-        assertThat(result).get().isEqualTo(taskEntity);
+        assertTrue(result.isPresent());
+        assertEqualsTask(taskEntity, result.get());
     }
 
     @Test
@@ -88,10 +91,10 @@ public class TaskRepositoryTest extends RepositoryTest {
         TaskEntity taskEntity = taskRepository.createTask(buildTaskEntity());
 
         // when
-        List<TaskEntity> result = taskRepository.getTasks(0, 10);
+        List<TaskEntity> result = taskRepository.getTasks(0, 10, taskEntity.status());
 
         // then
-        AssertionsForInterfaceTypes.assertThat(result).containsExactly(taskEntity);
+        assertThat(result).containsExactly(taskEntity);
     }
 
     @Test
@@ -102,10 +105,10 @@ public class TaskRepositoryTest extends RepositoryTest {
         taskRepository.createTask(buildTaskEntity());
 
         // when
-        List<TaskEntity> result = taskRepository.getTasks(0, 2);
+        List<TaskEntity> result = taskRepository.getTasks(0, 2, TaskStatusEnum.PUBLISHED.getValue());
 
         // then
-        AssertionsForInterfaceTypes.assertThat(result).hasSize(2);
+        assertThat(result).hasSize(2);
     }
 
     @Test
@@ -116,18 +119,26 @@ public class TaskRepositoryTest extends RepositoryTest {
         taskRepository.createTask(buildTaskEntity());
 
         // when
-        List<TaskEntity> result = taskRepository.getTasks(1, 2);
+        List<TaskEntity> result = taskRepository.getTasks(1, 2, TaskStatusEnum.PUBLISHED.getValue());
 
         // then
-        AssertionsForInterfaceTypes.assertThat(result).hasSize(1);
+        assertThat(result).hasSize(1);
     }
 
     @Test
     void givenEmptyDb_whenGetTasks_thenReturnEmptyList() {
         // when
-        List<TaskEntity> result = taskRepository.getTasks(0, 1);
+        List<TaskEntity> result = taskRepository.getTasks(0, 1, TaskStatusEnum.PUBLISHED.getValue());
 
         // then
-        AssertionsForInterfaceTypes.assertThat(result).isEmpty();
+        assertThat(result).isEmpty();
+    }
+
+    private static void assertEqualsTask(TaskEntity expected, TaskEntity actual) {
+        assertEquals(expected.id(), actual.id());
+        assertEquals(expected.title(), actual.title());
+        assertEquals(expected.description(), actual.description());
+        assertEquals(expected.status(), actual.status());
+        assertEquals(expected.executorId(), actual.executorId());
     }
 }

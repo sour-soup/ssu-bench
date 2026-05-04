@@ -52,6 +52,7 @@ public class TaskRepository {
     private static final String SQL_GET_TASKS = """
             SELECT id, title, description, reward, status, customer_id, executor_id, created_at, updated_at
             FROM tasks
+            WHERE status = :status
             ORDER BY created_at DESC LIMIT :limit OFFSET :offset
         """;
 
@@ -92,10 +93,11 @@ public class TaskRepository {
             .findFirst();
     }
 
-    public List<TaskEntity> getTasks(int page, int size) {
+    public List<TaskEntity> getTasks(int page, int size, String status) {
         MapSqlParameterSource params = new MapSqlParameterSource()
             .addValue(LIMIT_PARAM, size)
-            .addValue(OFFSET_PARAM, page * size);
+            .addValue(OFFSET_PARAM, page * size)
+            .addValue(STATUS_COL, status);
 
         return jdbcTemplate.query(SQL_GET_TASKS, params, TASK_ROW_MAPPER);
     }
