@@ -8,7 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.soup.ssu.bench.exception.BadRequestException;
 import org.soup.ssu.bench.repository.UserRepository;
 import org.soup.ssu.bench.repository.entity.UserEntity;
-import org.soup.ssu.bench.security.JwtService;
+import org.soup.ssu.bench.config.security.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ssu.bench.model.AuthResponse;
 import ssu.bench.model.LoginRequest;
