@@ -61,7 +61,7 @@ public class JwtService {
         }
 
         AuthenticatedUser authenticatedUser = AuthenticatedUser.builder()
-            .userId(new BigInteger(claims.getSubject()))
+            .id(new BigInteger(claims.getSubject()))
             .username(claims.get(USERNAME_CLAIM, String.class))
             .role(claims.get(ROLE_CLAIM, String.class))
             .build();

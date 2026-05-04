@@ -5,5 +5,5 @@ import lombok.Builder;
 import java.math.BigInteger;
 
 @Builder
-public record AuthenticatedUser(BigInteger userId, String username, String role) {
+public record AuthenticatedUser(BigInteger id, String username, String role) {
 }
