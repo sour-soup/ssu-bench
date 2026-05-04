@@ -14,15 +14,19 @@ import ssu.bench.model.AuthResponse;
 import ssu.bench.model.LoginRequest;
 import ssu.bench.model.RegisterRequest;
 import ssu.bench.model.RoleEnum;
-import ssu.bench.model.UserStatusEnum;
 
-import java.math.BigInteger;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.soup.ssu.bench.generator.EntityGenerator.PASSWORD;
+import static org.soup.ssu.bench.generator.EntityGenerator.PASSWORD_HASH;
+import static org.soup.ssu.bench.generator.EntityGenerator.TOKEN;
+import static org.soup.ssu.bench.generator.EntityGenerator.USERNAME;
+import static org.soup.ssu.bench.generator.EntityGenerator.CUSTOMER_ID;
+import static org.soup.ssu.bench.generator.EntityGenerator.buildUserEntity;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
@@ -37,12 +41,6 @@ class AuthServiceTest {
     @InjectMocks
     private AuthService authService;
 
-    private static final String USERNAME = "soup";
-    private static final String PASSWORD = "password";
-    private static final String TOKEN = "jwt-token-123";
-    private static final String PASSWORD_HASH = "$2a$10$hashedPassword";
-    private static final BigInteger USER_ID = BigInteger.ONE;
-
     @Test
     void givenNewUser_whenRegister_thenReturnToken() {
         // given
@@ -51,8 +49,8 @@ class AuthServiceTest {
         when(passwordEncoder.encode(registerRequest.getPassword())).thenReturn(PASSWORD_HASH);
 
         UserEntity userEntity = buildUserEntity();
-        when(userRepository.createUser(userEntity)).thenReturn(userEntity.withId(USER_ID));
-        when(jwtService.createToken(registerRequest.getUsername(), USER_ID, registerRequest.getRole().getValue()))
+        when(userRepository.createUser(userEntity)).thenReturn(userEntity.withId(CUSTOMER_ID));
+        when(jwtService.createToken(registerRequest.getUsername(), CUSTOMER_ID, registerRequest.getRole().getValue()))
             .thenReturn(TOKEN);
 
         // when
@@ -93,11 +91,11 @@ class AuthServiceTest {
     void givenExistUser_whenLogin_thenReturnToken() {
         // given
         LoginRequest loginRequest = buildLoginRequest();
-        UserEntity userEntity = buildUserEntity().withId(USER_ID);
+        UserEntity userEntity = buildUserEntity().withId(CUSTOMER_ID);
         when(userRepository.getUserByUsername(USERNAME)).thenReturn(Optional.of(userEntity));
         when(passwordEncoder.matches(loginRequest.getPassword(), PASSWORD_HASH)).thenReturn(true);
 
-        when(jwtService.createToken(loginRequest.getUsername(), USER_ID, userEntity.role()))
+        when(jwtService.createToken(loginRequest.getUsername(), CUSTOMER_ID, userEntity.role()))
             .thenReturn(TOKEN);
 
         // when
@@ -125,7 +123,7 @@ class AuthServiceTest {
     void givenInvalidPassword_whenLogin_thenThrowBadRequest() {
         // given
         LoginRequest loginRequest = buildLoginRequest();
-        UserEntity userEntity = buildUserEntity().withId(USER_ID);
+        UserEntity userEntity = buildUserEntity().withId(CUSTOMER_ID);
         when(userRepository.getUserByUsername(USERNAME)).thenReturn(Optional.of(userEntity));
         when(passwordEncoder.matches(loginRequest.getPassword(), PASSWORD_HASH)).thenReturn(false);
 
@@ -134,16 +132,6 @@ class AuthServiceTest {
             .isInstanceOf(BadRequestException.class);
 
         verifyNoMoreInteractions(userRepository, jwtService, passwordEncoder);
-    }
-
-    private static UserEntity buildUserEntity() {
-        return UserEntity.builder()
-            .username(USERNAME)
-            .passwordHash(PASSWORD_HASH)
-            .balance(BigInteger.ZERO)
-            .role(RoleEnum.CUSTOMER.getValue())
-            .status(UserStatusEnum.ACTIVE.getValue())
-            .build();
     }
 
     private static RegisterRequest buildRegisterRequest() {

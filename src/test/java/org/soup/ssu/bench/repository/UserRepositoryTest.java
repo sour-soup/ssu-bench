@@ -13,6 +13,7 @@ import java.util.Optional;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.soup.ssu.bench.generator.EntityGenerator.buildUserEntity;
 
 @Import(UserRepository.class)
 class UserRepositoryTest extends RepositoryTest {
@@ -148,15 +149,5 @@ class UserRepositoryTest extends RepositoryTest {
 
         // then
         assertThat(result).isEmpty();
-    }
-
-    private static UserEntity buildUserEntity() {
-        return UserEntity.builder()
-            .username("username")
-            .passwordHash("password_hash")
-            .role("role")
-            .balance(BigInteger.valueOf(137))
-            .status("status")
-            .build();
     }
 }

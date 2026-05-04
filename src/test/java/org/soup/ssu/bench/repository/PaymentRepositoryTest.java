@@ -6,10 +6,9 @@ import org.soup.ssu.bench.repository.entity.PaymentEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 
-import java.math.BigInteger;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.soup.ssu.bench.generator.EntityGenerator.buildPaymentEntity;
 
 @Import(PaymentRepository.class)
 public class PaymentRepositoryTest extends RepositoryTest {
@@ -28,14 +27,5 @@ public class PaymentRepositoryTest extends RepositoryTest {
         // then
         assertNotNull(insertedPayment.id());
         assertEquals(paymentEntity.withId(insertedPayment.id()), insertedPayment);
-    }
-
-    private static PaymentEntity buildPaymentEntity() {
-        return PaymentEntity.builder()
-            .type("HOLD")
-            .taskId(BigInteger.ONE)
-            .senderId(BigInteger.TEN)
-            .receiverId(BigInteger.TWO)
-            .build();
     }
 }

@@ -14,6 +14,7 @@ import java.util.Optional;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.soup.ssu.bench.generator.EntityGenerator.buildTaskEntity;
 
 @Import(TaskRepository.class)
 public class TaskRepositoryTest extends RepositoryTest {
@@ -128,15 +129,5 @@ public class TaskRepositoryTest extends RepositoryTest {
 
         // then
         AssertionsForInterfaceTypes.assertThat(result).isEmpty();
-    }
-
-    private static TaskEntity buildTaskEntity() {
-        return TaskEntity.builder()
-            .title("title")
-            .description("description")
-            .reward(BigInteger.ZERO)
-            .status("new")
-            .customerId(BigInteger.ONE)
-            .build();
     }
 }

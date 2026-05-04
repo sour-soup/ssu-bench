@@ -14,6 +14,7 @@ import java.util.Optional;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.soup.ssu.bench.generator.EntityGenerator.buildBidEntity;
 
 @Import(BidRepository.class)
 public class BidRepositoryTest extends RepositoryTest {
@@ -115,12 +116,5 @@ public class BidRepositoryTest extends RepositoryTest {
 
         // then
         AssertionsForInterfaceTypes.assertThat(result).isEmpty();
-    }
-
-    private static BidEntity buildBidEntity() {
-        return BidEntity.builder()
-            .status("new")
-            .taskId(BigInteger.ONE)
-            .build();
     }
 }
