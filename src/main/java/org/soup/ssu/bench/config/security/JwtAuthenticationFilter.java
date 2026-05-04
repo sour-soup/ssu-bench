@@ -1,4 +1,4 @@
-package org.soup.ssu.bench.security;
+package org.soup.ssu.bench.config.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

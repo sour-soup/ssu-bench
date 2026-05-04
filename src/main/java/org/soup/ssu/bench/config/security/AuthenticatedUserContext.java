@@ -1,4 +1,4 @@
-package org.soup.ssu.bench.security;
+package org.soup.ssu.bench.config.security;
 
 import org.soup.ssu.bench.exception.UnauthorizedException;
 import org.springframework.security.core.Authentication;

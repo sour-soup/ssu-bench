@@ -2,11 +2,10 @@ package org.soup.ssu.bench.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.soup.ssu.bench.config.security.JwtService;
 import org.soup.ssu.bench.exception.BadRequestException;
-import org.soup.ssu.bench.exception.EntityNotFoundException;
 import org.soup.ssu.bench.repository.UserRepository;
 import org.soup.ssu.bench.repository.entity.UserEntity;
-import org.soup.ssu.bench.security.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ssu.bench.model.AuthResponse;

@@ -1,8 +1,8 @@
 package org.soup.ssu.bench.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.soup.ssu.bench.security.AuthenticatedUser;
-import org.soup.ssu.bench.security.AuthenticatedUserContext;
+import org.soup.ssu.bench.config.security.AuthenticatedUser;
+import org.soup.ssu.bench.config.security.AuthenticatedUserContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ssu.bench.endpoint.BidsApi;
