@@ -28,29 +28,29 @@ public class TaskRepository {
     private static final String SQL_CREATE_TASK = """
             INSERT INTO tasks (title, description, reward, status, customer_id, created_at, updated_at)
             VALUES(:title, :description, :reward, :status, :customer_id, now(), now())
-            RETURNING id, title, description, reward, status, customer_id, executor_id;
+            RETURNING id, title, description, reward, status, customer_id, executor_id, created_at, updated_at;
         """;
 
     private static final String SQL_UPDATE_EXECUTOR = """
             UPDATE tasks SET executor_id=:executor_id, updated_at=now()
             WHERE id=:id
-            RETURNING id, title, description, reward, status, customer_id, executor_id;
+            RETURNING id, title, description, reward, status, customer_id, executor_id, created_at, updated_at;
         """;
 
     private static final String SQL_UPDATE_STATUS = """
             UPDATE tasks SET status=:status, updated_at=now()
             WHERE id=:id
-            RETURNING id, title, description, reward, status, customer_id, executor_id;
+            RETURNING id, title, description, reward, status, customer_id, executor_id, created_at, updated_at;
         """;
 
     private static final String SQL_GET_TASK = """
-            SELECT id, title, description, reward, status, customer_id, executor_id
+            SELECT id, title, description, reward, status, customer_id, executor_id, created_at, updated_at
             FROM tasks
             WHERE id = :id
         """;
 
     private static final String SQL_GET_TASKS = """
-            SELECT id, title, description, reward, status, customer_id, executor_id
+            SELECT id, title, description, reward, status, customer_id, executor_id, created_at, updated_at
             FROM tasks
             ORDER BY created_at DESC LIMIT :limit OFFSET :offset
         """;

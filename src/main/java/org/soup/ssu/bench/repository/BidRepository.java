@@ -24,23 +24,23 @@ public class BidRepository {
     private static final String SQL_CREATE_BID = """
             INSERT INTO bids (status, task_id, created_at, updated_at)
             VALUES(:status, :task_id, now(), now())
-            RETURNING id, status, task_id, executor_id;
+            RETURNING id, status, task_id, executor_id, created_at;
         """;
 
     private static final String SQL_UPDATE_STATUS = """
             UPDATE bids SET status=:status, updated_at=now()
             WHERE id=:id
-            RETURNING id, status, task_id, executor_id;
+            RETURNING id, status, task_id, executor_id, created_at;
         """;
 
     private static final String SQL_GET_BID = """
-            SELECT id, status, task_id, executor_id
+            SELECT id, status, task_id, executor_id, created_at
             FROM bids
             WHERE id = :id
         """;
 
     private static final String SQL_GET_BIDS = """
-            SELECT id, status, task_id, executor_id
+            SELECT id, status, task_id, executor_id, created_at
             FROM bids
             ORDER BY created_at DESC LIMIT :limit OFFSET :offset
         """;

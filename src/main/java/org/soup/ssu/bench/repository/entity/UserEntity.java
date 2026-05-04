@@ -5,7 +5,9 @@ import lombok.With;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 
+import static org.soup.ssu.bench.constant.CommonDataConstants.CREATED_AT_COL;
 import static org.soup.ssu.bench.constant.CommonDataConstants.ID_COL;
 import static org.soup.ssu.bench.constant.CommonDataConstants.STATUS_COL;
 
@@ -16,7 +18,8 @@ public record UserEntity(BigInteger id,
                          String passwordHash,
                          String role,
                          BigInteger balance,
-                         String status) {
+                         String status,
+                         LocalDateTime createdAt) {
 
     public static final String USERNAME_COL = "username";
     public static final String PASSWORD_HASH_COL = "password_hash";
@@ -30,5 +33,6 @@ public record UserEntity(BigInteger id,
         .role(rs.getString(ROLE_COL))
         .balance(BigInteger.valueOf(rs.getLong(BALANCE_COL)))
         .status(rs.getString(STATUS_COL))
+        .createdAt(rs.getObject(CREATED_AT_COL, LocalDateTime.class))
         .build();
 }

@@ -27,33 +27,36 @@ public class UserRepository {
     private static final String SQL_CREATE_USER = """
             INSERT INTO users (username, password_hash, role, balance, status, created_at, updated_at)
             VALUES (:username, :password_hash, :role, :balance, :status, now(), now())
-            RETURNING id, username, password_hash, role, balance, status
+            RETURNING id, username, password_hash, role, balance, status, created_at
         """;
 
     private static final String SQL_UPDATE_BALANCE = """
             UPDATE users SET balance = :balance, updated_at = now()
             WHERE id = :id
-            RETURNING id, username, password_hash, role, balance, status
+            RETURNING id, username, password_hash, role, balance, status, created_at
         """;
 
     private static final String SQL_UPDATE_STATUS = """
             UPDATE users SET status = :status, updated_at = now()
             WHERE id = :id
-            RETURNING id, username, password_hash, role, balance, status
+            RETURNING id, username, password_hash, role, balance, status, created_at
         """;
 
     private static final String SQL_GET_USER_BY_ID = """
-            SELECT id, username, password_hash, role, balance, status FROM users
+            SELECT id, username, password_hash, role, balance, status, created_at
+            FROM users
             WHERE id = :id
         """;
 
     private static final String SQL_GET_USER_BY_USERNAME = """
-            SELECT id, username, password_hash, role, balance, status FROM users
+            SELECT id, username, password_hash, role, balance, status, created_at
+            FROM users
             WHERE username = :username
         """;
 
     private static final String SQL_GET_USERS = """
-            SELECT id, username, password_hash, role, balance, status FROM users
+            SELECT id, username, password_hash, role, balance, status, created_at
+            FROM users
             ORDER BY created_at DESC LIMIT :limit OFFSET :offset
         """;
 

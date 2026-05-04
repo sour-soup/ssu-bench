@@ -5,7 +5,9 @@ import lombok.With;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 
+import static org.soup.ssu.bench.constant.CommonDataConstants.CREATED_AT_COL;
 import static org.soup.ssu.bench.constant.CommonDataConstants.ID_COL;
 import static org.soup.ssu.bench.constant.CommonDataConstants.STATUS_COL;
 
@@ -14,7 +16,8 @@ import static org.soup.ssu.bench.constant.CommonDataConstants.STATUS_COL;
 public record BidEntity(BigInteger id,
                         String status,
                         BigInteger taskId,
-                        BigInteger executorId) {
+                        BigInteger executorId,
+                        LocalDateTime createdAt) {
 
     public static final String TASK_ID_COL = "task_id";
     public static final String EXECUTOR_ID_COL = "executor_id";
@@ -24,5 +27,6 @@ public record BidEntity(BigInteger id,
         .status(rs.getString(STATUS_COL))
         .taskId(rs.getObject(TASK_ID_COL, BigInteger.class))
         .executorId(rs.getObject(EXECUTOR_ID_COL, BigInteger.class))
+        .createdAt(rs.getObject(CREATED_AT_COL, LocalDateTime.class))
         .build();
 }
