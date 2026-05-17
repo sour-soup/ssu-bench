@@ -157,31 +157,6 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-  /tasks/{taskId}/complete:
-    post:
-      operationId: postCompleteTask
-      tags: [ Tasks ]
-      summary: Mark task as completed
-      security:
-        - bearerAuth: [ EXECUTOR ]
-      parameters:
-        - $ref: '#/components/parameters/TaskId'
-      responses:
-        '200':
-          description: Task marked completed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TaskResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-
   /tasks/{taskId}/confirm:
     post:
       operationId: postConfirmTask
