@@ -2,7 +2,6 @@ package org.soup.ssu.bench.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.compare.ComparableUtils;
 import org.soup.ssu.bench.exception.BadRequestException;
 import org.soup.ssu.bench.exception.EntityNotFoundException;
 import org.soup.ssu.bench.exception.ForbiddenException;
@@ -26,7 +25,6 @@ import ssu.bench.model.TaskStatusEnum;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 
 @Slf4j
 @Service
@@ -62,23 +60,19 @@ public class BidService {
     }
 
     @Transactional
-    public BidResponse acceptBid(BigInteger bidId, BigInteger executorId) {
-        BidEntity bidEntity = getAndValidateBid(bidId, executorId);
-        TaskEntity taskEntity = getAndValidateTask(bidEntity.taskId());
-        UserEntity executor = getAndValidateExecutorBalance(executorId, taskEntity.reward());
+    public BidResponse acceptBid(BigInteger bidId, BigInteger customerId) {
+        BidEntity bidEntity = getAndValidateBid(bidId);
+        TaskEntity taskEntity = getAndValidateTask(bidEntity.taskId(), customerId);
+        UserEntity executor = getAndValidateExecutorBalance(customerId, taskEntity.reward());
 
         executeAcceptanceTransaction(bidEntity, taskEntity, executor);
 
         return mapBidEntityToResponse(bidEntity);
     }
 
-    private BidEntity getAndValidateBid(BigInteger bidId, BigInteger executorId) {
+    private BidEntity getAndValidateBid(BigInteger bidId) {
         BidEntity bidEntity = bidRepository.getBidById(bidId)
             .orElseThrow(() -> new EntityNotFoundException("Bid", bidId));
-
-        if (!bidEntity.executorId().equals(executorId)) {
-            throw new ForbiddenException("You are not the executor of this bid");
-        }
 
         if (!bidEntity.status().equals(BidStatusEnum.PENDING.getValue())) {
             throw new BadRequestException("Bid status must be PENDING, current status: " +
@@ -88,9 +82,13 @@ public class BidService {
         return bidEntity;
     }
 
-    private TaskEntity getAndValidateTask(BigInteger taskId) {
+    private TaskEntity getAndValidateTask(BigInteger taskId, BigInteger customerId) {
         TaskEntity taskEntity = taskRepository.getTaskById(taskId)
             .orElseThrow(() -> new InternalErrorException("Task not found for ID: " + taskId));
+
+        if (!taskEntity.customerId().equals(customerId)) {
+            throw new ForbiddenException("You are not the customer of this bid");
+        }
 
         if (!taskEntity.status().equals(TaskStatusEnum.PUBLISHED.getValue())) {
             throw new BadRequestException("Task status must be PUBLISHED, current status: " +
@@ -106,8 +104,10 @@ public class BidService {
 
         if (executor.balance().compareTo(requiredReward) < 0) {
             throw new BadRequestException(
-                String.format("Insufficient balance. Required: %d, Available: %d",
-                    requiredReward, executor.balance())
+                String.format(
+                    "Insufficient balance. Required: %d, Available: %d",
+                    requiredReward, executor.balance()
+                )
             );
         }
 
@@ -123,8 +123,10 @@ public class BidService {
         userRepository.updateBalance(executor.id(), executor.balance().subtract(taskEntity.reward()));
         paymentRepository.createPayment(buildHoldPaymentEntity(taskEntity));
 
-        log.info("Bid {} accepted for task {}. Amount {} held from executor {}",
-            bidEntity.id(), taskEntity.id(), taskEntity.reward(), executor.id());
+        log.info(
+            "Bid {} accepted for task {}. Amount {} held from executor {}",
+            bidEntity.id(), taskEntity.id(), taskEntity.reward(), executor.id()
+        );
     }
 
     private PaymentEntity buildHoldPaymentEntity(TaskEntity taskEntity) {

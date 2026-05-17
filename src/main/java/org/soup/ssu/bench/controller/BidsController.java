@@ -33,7 +33,7 @@ public class BidsController implements BidsApi {
     }
 
     @Override
-    @PreAuthorize("hasRole('ADMIN') || hasRole('EXECUTOR')")
+    @PreAuthorize("hasRole('ADMIN') || hasRole('CUSTOMER')")
     public ResponseEntity<BidResponse> postAcceptBid(BigInteger bidId) {
         AuthenticatedUser user = userContext.getAuthenticatedUser();
         BidResponse bidResponse = bidService.acceptBid(bidId, user.id());
