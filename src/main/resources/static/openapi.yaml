@@ -256,26 +256,6 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-  /bids/my:
-    get:
-      operationId: getMyBids
-      tags: [ Bids ]
-      summary: List my bids
-      security:
-        - bearerAuth: [ EXECUTOR ]
-      parameters:
-        - $ref: '#/components/parameters/Page'
-        - $ref: '#/components/parameters/Size'
-      responses:
-        '200':
-          description: Bid page
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PageBidResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-
   /bids/{bidId}:
     get:
       operationId: getBidById
