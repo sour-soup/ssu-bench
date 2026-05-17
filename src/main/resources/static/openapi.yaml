@@ -674,6 +674,9 @@ components:
     BidStatusEnum:
       type: string
       enum: [ PENDING, ACCEPTED, REJECTED ]
+    PaymentTypeEnum:
+      type: string
+      enum: [ HOLD, REFUND, CHARGE ]
     DepositRequest:
       type: object
       required: [ amount ]
