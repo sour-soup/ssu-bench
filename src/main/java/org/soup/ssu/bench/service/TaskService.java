@@ -24,7 +24,6 @@ import ssu.bench.model.TaskStatusEnum;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Objects;
 
 @Slf4j
 @Service
@@ -61,35 +60,20 @@ public class TaskService {
 
     @Transactional
     public TaskResponse cancelTask(BigInteger taskId, BigInteger customerId) {
-        TaskEntity taskEntity = taskRepository.getTaskById(taskId)
-            .orElseThrow(() -> new EntityNotFoundException("Task", taskId));
+        TaskEntity taskEntity = getAndValidateTaskForCustomer(taskId, customerId);
         UserEntity customer = userRepository.getUserById(customerId)
             .orElseThrow(() -> new EntityNotFoundException("User", customerId));
 
-        if (!Objects.equals(taskEntity.customerId(), customerId)) {
-            throw new ForbiddenException("You are not a customer");
-        }
-
         if (isTaskInProgress(taskEntity)) {
-            log.info("Task has been canceled. Money has been returned to the customer");
-            paymentRepository.createPayment(buildPaymentEntity(taskEntity, PaymentTypeEnum.REFUND));
-            userRepository.updateBalance(customerId, customer.balance().add(taskEntity.reward()));
+            processTaskCancellationRefund(taskEntity, customer);
         }
 
-        TaskEntity updatedTaskEntity = taskRepository.updateStatus(taskId, TaskStatusEnum.CANCELLED.getValue());
-        bidRepository.updateStatusByTaskId(taskId, BidStatusEnum.REJECTED.getValue());
-
-        return mapTaskEntityToResponse(updatedTaskEntity);
+        return finalizeTaskCancellation(taskEntity);
     }
 
     @Transactional
     public TaskResponse confirmTask(BigInteger taskId, BigInteger customerId) {
-        TaskEntity taskEntity = taskRepository.getTaskById(taskId)
-            .orElseThrow(() -> new EntityNotFoundException("Task", taskId));
-
-        if (!Objects.equals(taskEntity.customerId(), customerId)) {
-            throw new ForbiddenException("You are not a customer");
-        }
+        TaskEntity taskEntity = getAndValidateTaskForCustomer(taskId, customerId);
 
         if (!isTaskInProgress(taskEntity)) {
             throw new BadRequestException("Task is not in progress");
@@ -98,11 +82,44 @@ public class TaskService {
         UserEntity executor = userRepository.getUserById(taskEntity.executorId())
             .orElseThrow(() -> new InternalErrorException("Executor not found"));
 
-        paymentRepository.createPayment(buildPaymentEntity(taskEntity, PaymentTypeEnum.CHARGE));
-        userRepository.updateBalance(executor.id(), executor.balance().add(taskEntity.reward()));
+        processTaskCompletionPayment(taskEntity, executor);
 
         TaskEntity updatedTaskEntity = taskRepository.updateStatus(taskId, TaskStatusEnum.COMPLETED.getValue());
+        return mapTaskEntityToResponse(updatedTaskEntity);
+    }
 
+    private TaskEntity getAndValidateTaskForCustomer(BigInteger taskId, BigInteger customerId) {
+        TaskEntity taskEntity = taskRepository.getTaskById(taskId)
+            .orElseThrow(() -> new EntityNotFoundException("Task", taskId));
+
+        if (!taskEntity.customerId().equals(customerId)) {
+            throw new ForbiddenException("You are not a customer");
+        }
+
+        return taskEntity;
+    }
+
+    private void processTaskCancellationRefund(TaskEntity taskEntity, UserEntity customer) {
+        log.info(
+            "Task {} cancelled. Refund of {} processed to customer {}",
+            taskEntity.id(), taskEntity.reward(), customer.id()
+        );
+        paymentRepository.createPayment(buildPaymentEntity(taskEntity, PaymentTypeEnum.REFUND));
+        userRepository.updateBalance(customer.id(), customer.balance().add(taskEntity.reward()));
+    }
+
+    private void processTaskCompletionPayment(TaskEntity taskEntity, UserEntity executor) {
+        log.info(
+            "Task {} completed. Payment of {} transferred to executor {}",
+            taskEntity.id(), taskEntity.reward(), executor.id()
+        );
+        paymentRepository.createPayment(buildPaymentEntity(taskEntity, PaymentTypeEnum.CHARGE));
+        userRepository.updateBalance(executor.id(), executor.balance().add(taskEntity.reward()));
+    }
+
+    private TaskResponse finalizeTaskCancellation(TaskEntity taskEntity) {
+        TaskEntity updatedTaskEntity = taskRepository.updateStatus(taskEntity.id(), TaskStatusEnum.CANCELLED.getValue());
+        bidRepository.updateStatusByTaskId(taskEntity.id(), BidStatusEnum.REJECTED.getValue());
         return mapTaskEntityToResponse(updatedTaskEntity);
     }
 

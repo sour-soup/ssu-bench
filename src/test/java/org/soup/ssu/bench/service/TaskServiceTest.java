@@ -213,7 +213,6 @@ class TaskServiceTest {
         TaskEntity taskEntity = buildTaskEntity().withId(TASK_ID).withCustomerId(CUSTOMER_ID);
 
         when(taskRepository.getTaskById(TASK_ID)).thenReturn(Optional.of(taskEntity));
-        when(userRepository.getUserById(differentCustomerId)).thenReturn(Optional.of(buildUserEntity().withId(differentCustomerId)));
 
         // when & then
         assertThrows(ForbiddenException.class, () -> taskService.cancelTask(TASK_ID, differentCustomerId));
