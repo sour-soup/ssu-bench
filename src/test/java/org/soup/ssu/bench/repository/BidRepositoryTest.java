@@ -5,6 +5,7 @@ import org.soup.ssu.bench.RepositoryTest;
 import org.soup.ssu.bench.repository.entity.BidEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import ssu.bench.model.BidStatusEnum;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -14,6 +15,7 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.soup.ssu.bench.generator.EntityGenerator.TASK_ID;
 import static org.soup.ssu.bench.generator.EntityGenerator.buildBidEntity;
 
 @Import(BidRepository.class)
@@ -38,7 +40,8 @@ public class BidRepositoryTest extends RepositoryTest {
     @Test
     void givenBidInDb_whenUpdateStatus_thenReturnUpdatedBid() {
         // given
-        String newStatus = "accepted";
+        String newStatus = BidStatusEnum.ACCEPTED.getValue();
+        ;
         BidEntity bidEntity = bidRepository.createBid(buildBidEntity());
 
         // when
@@ -46,6 +49,23 @@ public class BidRepositoryTest extends RepositoryTest {
 
         // then
         assertEqualsBid(bidEntity.withStatus(newStatus), insertedBid);
+    }
+
+    @Test
+    void givenBidsInDb_whenUpdateStatusByTaskId_thenUpdateAllBids() {
+        String newStatus = BidStatusEnum.ACCEPTED.getValue();
+        BidEntity firstBid = bidRepository.createBid(buildBidEntity().withExecutorId(BigInteger.valueOf(1)));
+        BidEntity secondBid = bidRepository.createBid(buildBidEntity().withExecutorId(BigInteger.valueOf(2)));
+
+        // when
+        bidRepository.updateStatusByTaskId(firstBid.taskId(), newStatus);
+
+        // then
+        BidEntity updatedFirstBid = bidRepository.getBidById(firstBid.id()).orElseThrow();
+        BidEntity updatedSecondBid = bidRepository.getBidById(secondBid.id()).orElseThrow();
+
+        assertEqualsBid(firstBid.withStatus(newStatus), updatedFirstBid);
+        assertEqualsBid(secondBid.withStatus(newStatus), updatedSecondBid);
     }
 
     @Test
@@ -76,7 +96,7 @@ public class BidRepositoryTest extends RepositoryTest {
         BidEntity bidEntity = bidRepository.createBid(buildBidEntity());
 
         // when
-        List<BidEntity> result = bidRepository.getBids(0, 10);
+        List<BidEntity> result = bidRepository.getBids(TASK_ID, 0, 10);
 
         // then
         assertThat(result).containsExactly(bidEntity);
@@ -85,12 +105,12 @@ public class BidRepositoryTest extends RepositoryTest {
     @Test
     void givenBidsInDb_whenGetBids_thenReturnLimitBids() {
         // given
-        bidRepository.createBid(buildBidEntity().withTaskId(BigInteger.valueOf(1)));
-        bidRepository.createBid(buildBidEntity().withTaskId(BigInteger.valueOf(2)));
-        bidRepository.createBid(buildBidEntity().withTaskId(BigInteger.valueOf(3)));
+        bidRepository.createBid(buildBidEntity().withExecutorId(BigInteger.valueOf(1)));
+        bidRepository.createBid(buildBidEntity().withExecutorId(BigInteger.valueOf(2)));
+        bidRepository.createBid(buildBidEntity().withExecutorId(BigInteger.valueOf(3)));
 
         // when
-        List<BidEntity> result = bidRepository.getBids(0, 2);
+        List<BidEntity> result = bidRepository.getBids(TASK_ID, 0, 2);
 
         // then
         assertThat(result).hasSize(2);
@@ -99,12 +119,12 @@ public class BidRepositoryTest extends RepositoryTest {
     @Test
     void givenBidsInDb_whenGetBids_thenReturnOffsetBids() {
         // given
-        bidRepository.createBid(buildBidEntity().withTaskId(BigInteger.valueOf(1)));
-        bidRepository.createBid(buildBidEntity().withTaskId(BigInteger.valueOf(2)));
-        bidRepository.createBid(buildBidEntity().withTaskId(BigInteger.valueOf(3)));
+        bidRepository.createBid(buildBidEntity().withExecutorId(BigInteger.valueOf(1)));
+        bidRepository.createBid(buildBidEntity().withExecutorId(BigInteger.valueOf(2)));
+        bidRepository.createBid(buildBidEntity().withExecutorId(BigInteger.valueOf(3)));
 
         // when
-        List<BidEntity> result = bidRepository.getBids(1, 2);
+        List<BidEntity> result = bidRepository.getBids(TASK_ID, 1, 2);
 
         // then
         assertThat(result).hasSize(1);
@@ -113,7 +133,7 @@ public class BidRepositoryTest extends RepositoryTest {
     @Test
     void givenEmptyDb_whenGetBids_thenReturnEmptyList() {
         // when
-        List<BidEntity> result = bidRepository.getBids(0, 1);
+        List<BidEntity> result = bidRepository.getBids(TASK_ID, 0, 1);
 
         // then
         assertThat(result).isEmpty();

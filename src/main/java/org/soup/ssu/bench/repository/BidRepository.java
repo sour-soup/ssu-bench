@@ -34,6 +34,11 @@ public class BidRepository {
             RETURNING id, status, task_id, executor_id, created_at;
         """;
 
+    private static final String SQL_UPDATE_STATUS_BY_TASK = """
+            UPDATE bids SET status=:status, updated_at=now()
+            WHERE task_id = :task_id;
+        """;
+
     private static final String SQL_GET_BID = """
             SELECT id, status, task_id, executor_id, created_at
             FROM bids
@@ -43,6 +48,7 @@ public class BidRepository {
     private static final String SQL_GET_BIDS = """
             SELECT id, status, task_id, executor_id, created_at
             FROM bids
+            WHERE task_id = :task_id
             ORDER BY created_at DESC LIMIT :limit OFFSET :offset
         """;
 
@@ -65,6 +71,14 @@ public class BidRepository {
         return jdbcTemplate.queryForObject(SQL_UPDATE_STATUS, params, BID_ROW_MAPPER);
     }
 
+    public void updateStatusByTaskId(BigInteger taskId, String status) {
+        MapSqlParameterSource params = new MapSqlParameterSource()
+            .addValue(TASK_ID_COL, taskId)
+            .addValue(STATUS_COL, status);
+
+        jdbcTemplate.update(SQL_UPDATE_STATUS_BY_TASK, params);
+    }
+
     public Optional<BidEntity> getBidById(BigInteger id) {
         MapSqlParameterSource params = new MapSqlParameterSource()
             .addValue(ID_COL, id);
@@ -73,8 +87,9 @@ public class BidRepository {
             .findFirst();
     }
 
-    public List<BidEntity> getBids(int page, int size) {
+    public List<BidEntity> getBids(BigInteger taskId, int page, int size) {
         MapSqlParameterSource params = new MapSqlParameterSource()
+            .addValue(TASK_ID_COL, taskId)
             .addValue(LIMIT_PARAM, size)
             .addValue(OFFSET_PARAM, page * size);
 
