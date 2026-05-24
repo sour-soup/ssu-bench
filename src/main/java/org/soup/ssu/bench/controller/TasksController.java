@@ -42,6 +42,14 @@ public class TasksController implements TasksApi {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN') || hasRole('EXECUTOR')")
+    public ResponseEntity<TaskResponse> postCompleteTask(BigInteger taskId) {
+        AuthenticatedUser user = authenticatedUserContext.getAuthenticatedUser();
+        TaskResponse taskResponse = taskService.completeTask(taskId, user.id());
+        return ResponseEntity.ok(taskResponse);
+    }
+
+    @Override
     @PreAuthorize("hasRole('ADMIN') || hasRole('CUSTOMER')")
     public ResponseEntity<TaskResponse> postConfirmTask(BigInteger taskId) {
         AuthenticatedUser user = authenticatedUserContext.getAuthenticatedUser();

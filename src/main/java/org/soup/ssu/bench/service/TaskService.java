@@ -71,12 +71,23 @@ public class TaskService {
         return finalizeTaskCancellation(taskEntity);
     }
 
+    public TaskResponse completeTask(BigInteger taskId, BigInteger customerId) {
+        TaskEntity taskEntity = getAndValidateTaskForExecutor(taskId, customerId);
+
+        if (!isTaskInProgress(taskEntity)) {
+            throw new BadRequestException("Task is not in progress");
+        }
+
+        TaskEntity updatedTaskEntity = taskRepository.updateStatus(taskId, TaskStatusEnum.COMPLETED.getValue());
+        return mapTaskEntityToResponse(updatedTaskEntity);
+    }
+
     @Transactional
     public TaskResponse confirmTask(BigInteger taskId, BigInteger customerId) {
         TaskEntity taskEntity = getAndValidateTaskForCustomer(taskId, customerId);
 
-        if (!isTaskInProgress(taskEntity)) {
-            throw new BadRequestException("Task is not in progress");
+        if (!isTaskCompleted(taskEntity)) {
+            throw new BadRequestException("Task is not completed");
         }
 
         UserEntity executor = userRepository.getUserById(taskEntity.executorId())
@@ -84,7 +95,7 @@ public class TaskService {
 
         processTaskCompletionPayment(taskEntity, executor);
 
-        TaskEntity updatedTaskEntity = taskRepository.updateStatus(taskId, TaskStatusEnum.COMPLETED.getValue());
+        TaskEntity updatedTaskEntity = taskRepository.updateStatus(taskId, TaskStatusEnum.CONFIRMED.getValue());
         return mapTaskEntityToResponse(updatedTaskEntity);
     }
 
@@ -94,6 +105,17 @@ public class TaskService {
 
         if (!taskEntity.customerId().equals(customerId)) {
             throw new ForbiddenException("You are not a customer");
+        }
+
+        return taskEntity;
+    }
+
+    private TaskEntity getAndValidateTaskForExecutor(BigInteger taskId, BigInteger executorId) {
+        TaskEntity taskEntity = taskRepository.getTaskById(taskId)
+            .orElseThrow(() -> new EntityNotFoundException("Task", taskId));
+
+        if (!taskEntity.executorId().equals(executorId)) {
+            throw new ForbiddenException("You are not a executor");
         }
 
         return taskEntity;
@@ -137,6 +159,10 @@ public class TaskService {
         return TaskStatusEnum.IN_PROGRESS.getValue().equals(taskEntity.status());
     }
 
+    private boolean isTaskCompleted(TaskEntity taskEntity) {
+        return TaskStatusEnum.COMPLETED.getValue().equals(taskEntity.status());
+    }
+
     private static TaskResponse mapTaskEntityToResponse(TaskEntity taskEntity) {
         return new TaskResponse()
             .id(taskEntity.id())
@@ -144,6 +170,8 @@ public class TaskService {
             .description(taskEntity.description())
             .reward(taskEntity.reward())
             .status(TaskStatusEnum.fromValue(taskEntity.status()))
+            .customerId(taskEntity.customerId())
+            .executorId(taskEntity.executorId())
             .createdAt(taskEntity.createdAt())
             .updatedAt(taskEntity.updatedAt());
     }

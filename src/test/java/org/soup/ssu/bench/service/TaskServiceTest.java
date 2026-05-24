@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.soup.ssu.bench.exception.BadRequestException;
 import org.soup.ssu.bench.exception.EntityNotFoundException;
 import org.soup.ssu.bench.exception.ForbiddenException;
+import org.soup.ssu.bench.exception.InternalErrorException;
 import org.soup.ssu.bench.repository.BidRepository;
 import org.soup.ssu.bench.repository.PaymentRepository;
 import org.soup.ssu.bench.repository.TaskRepository;
@@ -34,6 +35,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.soup.ssu.bench.generator.EntityGenerator.CUSTOMER_ID;
+import static org.soup.ssu.bench.generator.EntityGenerator.EXECUTOR_ID;
 import static org.soup.ssu.bench.generator.EntityGenerator.TASK_ID;
 import static org.soup.ssu.bench.generator.EntityGenerator.buildTaskEntity;
 import static org.soup.ssu.bench.generator.EntityGenerator.buildUserEntity;
@@ -220,31 +222,54 @@ class TaskServiceTest {
     }
 
     @Test
-    void givenTaskInProgress_whenConfirmTask_thenConfirmAndCharge() {
+    void givenTaskInProgress_whenCompleteTask_thenComplete() {
+        // given
+        TaskEntity taskEntity = buildTaskEntity()
+            .withId(TASK_ID)
+            .withCustomerId(CUSTOMER_ID)
+            .withExecutorId(EXECUTOR_ID)
+            .withStatus(TaskStatusEnum.IN_PROGRESS.getValue())
+            .withReward(BigInteger.valueOf(1000));
+
+        TaskEntity updatedTaskEntity = taskEntity.withStatus(TaskStatusEnum.COMPLETED.getValue());
+
+        when(taskRepository.getTaskById(TASK_ID)).thenReturn(Optional.of(taskEntity));
+        when(taskRepository.updateStatus(TASK_ID, TaskStatusEnum.COMPLETED.getValue())).thenReturn(updatedTaskEntity);
+
+        // when
+        TaskResponse response = taskService.completeTask(TASK_ID, EXECUTOR_ID);
+
+        // then
+        assertEquals(TaskStatusEnum.COMPLETED.getValue(), response.getStatus().getValue());
+        verify(taskRepository).updateStatus(TASK_ID, TaskStatusEnum.COMPLETED.getValue());
+    }
+
+    @Test
+    void givenTaskCompleted_whenConfirmTask_thenConfirmAndCharge() {
         // given
         BigInteger executorId = BigInteger.valueOf(200);
         TaskEntity taskEntity = buildTaskEntity()
             .withId(TASK_ID)
             .withCustomerId(CUSTOMER_ID)
             .withExecutorId(executorId)
-            .withStatus(TaskStatusEnum.IN_PROGRESS.getValue())
+            .withStatus(TaskStatusEnum.COMPLETED.getValue())
             .withReward(BigInteger.valueOf(1000));
 
         UserEntity executor = buildUserEntity().withId(executorId).withBalance(BigInteger.valueOf(5000));
-        TaskEntity updatedTaskEntity = taskEntity.withStatus(TaskStatusEnum.COMPLETED.getValue());
+        TaskEntity updatedTaskEntity = taskEntity.withStatus(TaskStatusEnum.CONFIRMED.getValue());
 
         when(taskRepository.getTaskById(TASK_ID)).thenReturn(Optional.of(taskEntity));
         when(userRepository.getUserById(executorId)).thenReturn(Optional.of(executor));
-        when(taskRepository.updateStatus(TASK_ID, TaskStatusEnum.COMPLETED.getValue())).thenReturn(updatedTaskEntity);
+        when(taskRepository.updateStatus(TASK_ID, TaskStatusEnum.CONFIRMED.getValue())).thenReturn(updatedTaskEntity);
 
         // when
         TaskResponse response = taskService.confirmTask(TASK_ID, CUSTOMER_ID);
 
         // then
-        assertEquals(TaskStatusEnum.COMPLETED.getValue(), response.getStatus().getValue());
+        assertEquals(TaskStatusEnum.CONFIRMED.getValue(), response.getStatus().getValue());
         verify(paymentRepository).createPayment(any(PaymentEntity.class));
         verify(userRepository).updateBalance(executorId, executor.balance().add(taskEntity.reward()));
-        verify(taskRepository).updateStatus(TASK_ID, TaskStatusEnum.COMPLETED.getValue());
+        verify(taskRepository).updateStatus(TASK_ID, TaskStatusEnum.CONFIRMED.getValue());
     }
 
     @Test
@@ -296,14 +321,14 @@ class TaskServiceTest {
             .withId(TASK_ID)
             .withCustomerId(CUSTOMER_ID)
             .withExecutorId(executorId)
-            .withStatus(TaskStatusEnum.IN_PROGRESS.getValue());
+            .withStatus(TaskStatusEnum.COMPLETED.getValue());
 
         when(taskRepository.getTaskById(TASK_ID)).thenReturn(Optional.of(taskEntity));
         when(userRepository.getUserById(executorId)).thenReturn(Optional.empty());
 
         // when & then
         assertThrows(
-            org.soup.ssu.bench.exception.InternalErrorException.class,
+            InternalErrorException.class,
             () -> taskService.confirmTask(TASK_ID, CUSTOMER_ID)
         );
         verify(taskRepository).getTaskById(TASK_ID);
