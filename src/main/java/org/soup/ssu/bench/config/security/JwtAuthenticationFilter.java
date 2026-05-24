@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.soup.ssu.bench.repository.UserRepository;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
+import ssu.bench.model.UserStatusEnum;
 
 import java.io.IOException;
 import java.util.List;
@@ -31,6 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final PathMatcher pathMatcher = new AntPathMatcher();
     private final JwtService jwtService;
+    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -50,9 +53,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String jwtToken = getJwtToken(request);
         Optional<AuthenticatedUser> jwtPrincipal = jwtService.parseToken(jwtToken);
 
-        jwtPrincipal.ifPresent(this::setAuthentication);
+        jwtPrincipal
+            .filter(this::isActiveUser)
+            .ifPresent(this::setAuthentication);
 
         filterChain.doFilter(request, response);
+    }
+
+    private boolean isActiveUser(AuthenticatedUser user) {
+        return userRepository.getUserById(user.id())
+            .filter(userEntity -> UserStatusEnum.ACTIVE.getValue().equals(userEntity.status()))
+            .isPresent();
     }
 
     private void setAuthentication(AuthenticatedUser authenticatedUser) {
