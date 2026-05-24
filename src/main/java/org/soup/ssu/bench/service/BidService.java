@@ -63,11 +63,11 @@ public class BidService {
     public BidResponse acceptBid(BigInteger bidId, BigInteger customerId) {
         BidEntity bidEntity = getAndValidateBid(bidId);
         TaskEntity taskEntity = getAndValidateTask(bidEntity.taskId(), customerId);
-        UserEntity executor = getAndValidateExecutorBalance(customerId, taskEntity.reward());
+        UserEntity customer = getAndValidateCustomerBalance(customerId, taskEntity.reward());
 
-        executeAcceptanceTransaction(bidEntity, taskEntity, executor);
+        BidEntity updatedBid = executeAcceptanceTransaction(bidEntity, taskEntity, customer);
 
-        return mapBidEntityToResponse(bidEntity);
+        return mapBidEntityToResponse(updatedBid);
     }
 
     private BidEntity getAndValidateBid(BigInteger bidId) {
@@ -98,7 +98,7 @@ public class BidService {
         return taskEntity;
     }
 
-    private UserEntity getAndValidateExecutorBalance(BigInteger executorId, BigInteger requiredReward) {
+    private UserEntity getAndValidateCustomerBalance(BigInteger executorId, BigInteger requiredReward) {
         UserEntity executor = userRepository.getUserById(executorId)
             .orElseThrow(() -> new InternalErrorException("Executor not found for ID: " + executorId));
 
@@ -114,19 +114,22 @@ public class BidService {
         return executor;
     }
 
-    private void executeAcceptanceTransaction(BidEntity bidEntity, TaskEntity taskEntity, UserEntity executor) {
+    private BidEntity executeAcceptanceTransaction(BidEntity bidEntity, TaskEntity taskEntity, UserEntity customer) {
         taskRepository.updateStatus(taskEntity.id(), TaskStatusEnum.IN_PROGRESS.getValue());
+        taskRepository.updateExecutor(taskEntity.id(), bidEntity.executorId());
 
         bidRepository.updateStatusByTaskId(taskEntity.id(), BidStatusEnum.REJECTED.getValue());
-        bidRepository.updateStatus(bidEntity.id(), BidStatusEnum.ACCEPTED.getValue());
+        BidEntity updatedBid = bidRepository.updateStatus(bidEntity.id(), BidStatusEnum.ACCEPTED.getValue());
 
-        userRepository.updateBalance(executor.id(), executor.balance().subtract(taskEntity.reward()));
+        userRepository.updateBalance(customer.id(), customer.balance().subtract(taskEntity.reward()));
         paymentRepository.createPayment(buildHoldPaymentEntity(taskEntity));
 
         log.info(
-            "Bid {} accepted for task {}. Amount {} held from executor {}",
-            bidEntity.id(), taskEntity.id(), taskEntity.reward(), executor.id()
+            "Bid {} accepted for task {}. Amount {} held from customer {}",
+            bidEntity.id(), taskEntity.id(), taskEntity.reward(), customer.id()
         );
+
+        return updatedBid;
     }
 
     private PaymentEntity buildHoldPaymentEntity(TaskEntity taskEntity) {

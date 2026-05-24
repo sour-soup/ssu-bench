@@ -63,25 +63,31 @@ class BidServiceTest {
 
     @Test
     void givenExistingBid_whenGetBidById_thenReturnBid() {
+        // given
         BidEntity bidEntity = buildBidEntity().withId(BID_ID);
         when(bidRepository.getBidById(BID_ID)).thenReturn(Optional.of(bidEntity));
 
+        // when
         BidResponse response = bidService.getBidById(BID_ID);
 
+        // then
         assertBidMapping(bidEntity, response);
         verify(bidRepository).getBidById(BID_ID);
     }
 
     @Test
     void givenNonExistingBid_whenGetBidById_thenThrowEntityNotFoundException() {
+        // given
         when(bidRepository.getBidById(BID_ID)).thenReturn(Optional.empty());
 
+        // when & then
         assertThrows(EntityNotFoundException.class, () -> bidService.getBidById(BID_ID));
         verify(bidRepository).getBidById(BID_ID);
     }
 
     @Test
     void givenBidsExist_whenGetTaskBids_thenReturnPageBidResponse() {
+        // given
         int page = 0;
         int size = 10;
 
@@ -91,8 +97,10 @@ class BidServiceTest {
 
         when(bidRepository.getBids(TASK_ID, page, size)).thenReturn(bidEntities);
 
+        // when
         PageBidResponse response = bidService.getTaskBids(TASK_ID, page, size);
 
+        // then
         assertNotNull(response);
         assertEquals(page, response.getPage());
         assertEquals(size, response.getSize());
@@ -101,26 +109,32 @@ class BidServiceTest {
 
     @Test
     void givenNoBids_whenGetTaskBids_thenReturnEmptyPageBidResponse() {
+        // given
         int page = 0;
         int size = 10;
 
         when(bidRepository.getBids(TASK_ID, page, size)).thenReturn(List.of());
 
+        // when
         PageBidResponse response = bidService.getTaskBids(TASK_ID, page, size);
 
+        // then
         assertNotNull(response);
         assertEquals(0, response.getContent().size());
     }
 
     @Test
     void givenValidRequest_whenCreateBid_thenReturnCreatedBid() {
+        // given
         BidEntity bidEntity = buildBidEntity();
         BidEntity savedBidEntity = bidEntity.withId(BID_ID);
 
         when(bidRepository.createBid(any(BidEntity.class))).thenReturn(savedBidEntity);
 
+        // when
         BidResponse response = bidService.createBid(TASK_ID, EXECUTOR_ID);
 
+        // then
         assertNotNull(response);
         assertEquals(BID_ID, response.getId());
         assertEquals(TASK_ID, response.getTaskId());
@@ -131,6 +145,7 @@ class BidServiceTest {
 
     @Test
     void givenValidBid_whenAcceptBid_thenAcceptAndProcessPayment() {
+        // given
         BidEntity bidEntity = buildBidEntity()
             .withId(BID_ID)
             .withTaskId(TASK_ID)
@@ -140,7 +155,6 @@ class BidServiceTest {
         TaskEntity taskEntity = buildTaskEntity()
             .withId(TASK_ID)
             .withCustomerId(CUSTOMER_ID)
-            .withExecutorId(EXECUTOR_ID)
             .withReward(REWARD)
             .withStatus(TaskStatusEnum.PUBLISHED.getValue());
 
@@ -151,28 +165,36 @@ class BidServiceTest {
         when(bidRepository.getBidById(BID_ID)).thenReturn(Optional.of(bidEntity));
         when(taskRepository.getTaskById(TASK_ID)).thenReturn(Optional.of(taskEntity));
         when(userRepository.getUserById(CUSTOMER_ID)).thenReturn(Optional.of(customer));
+        when(bidRepository.updateStatus(BID_ID, BidStatusEnum.ACCEPTED.getValue()))
+            .thenReturn(bidEntity.withStatus(BidStatusEnum.ACCEPTED.getValue()));
 
+        // when
         BidResponse response = bidService.acceptBid(BID_ID, CUSTOMER_ID);
 
-        assertBidMapping(bidEntity, response);
+        // then
+        assertBidMapping(bidEntity.withStatus(BidStatusEnum.ACCEPTED.getValue()), response);
 
         verify(userRepository).updateBalance(CUSTOMER_ID, customer.balance().subtract(taskEntity.reward()));
         verify(paymentRepository).createPayment(any(PaymentEntity.class));
         verify(taskRepository).updateStatus(TASK_ID, TaskStatusEnum.IN_PROGRESS.getValue());
+        verify(taskRepository).updateExecutor(TASK_ID, EXECUTOR_ID);
         verify(bidRepository).updateStatusByTaskId(TASK_ID, BidStatusEnum.REJECTED.getValue());
         verify(bidRepository).updateStatus(BID_ID, BidStatusEnum.ACCEPTED.getValue());
     }
 
     @Test
     void givenNonExistingBid_whenAcceptBid_thenThrowEntityNotFoundException() {
+        // given
         when(bidRepository.getBidById(BID_ID)).thenReturn(Optional.empty());
 
+        // when & then
         assertThrows(EntityNotFoundException.class, () -> bidService.acceptBid(BID_ID, CUSTOMER_ID));
         verifyNoInteractions(taskRepository, userRepository, paymentRepository);
     }
 
     @Test
     void givenNonPendingBid_whenAcceptBid_thenThrowBadRequestException() {
+        // given
         BidEntity bidEntity = buildBidEntity()
             .withId(BID_ID)
             .withExecutorId(EXECUTOR_ID)
@@ -180,12 +202,14 @@ class BidServiceTest {
 
         when(bidRepository.getBidById(BID_ID)).thenReturn(Optional.of(bidEntity));
 
+        // when & then
         assertThrows(BadRequestException.class, () -> bidService.acceptBid(BID_ID, CUSTOMER_ID));
         verify(taskRepository, never()).getTaskById(any());
     }
 
     @Test
     void givenTaskNotFound_whenAcceptBid_thenThrowInternalErrorException() {
+        // given
         BidEntity bidEntity = buildBidEntity()
             .withId(BID_ID)
             .withTaskId(TASK_ID)
@@ -195,11 +219,13 @@ class BidServiceTest {
         when(bidRepository.getBidById(BID_ID)).thenReturn(Optional.of(bidEntity));
         when(taskRepository.getTaskById(TASK_ID)).thenReturn(Optional.empty());
 
+        // when & then
         assertThrows(InternalErrorException.class, () -> bidService.acceptBid(BID_ID, CUSTOMER_ID));
     }
 
     @Test
     void givenDifferentCustomer_whenAcceptBid_thenThrowForbiddenException() {
+        // given
         BidEntity bidEntity = buildBidEntity()
             .withId(BID_ID)
             .withTaskId(TASK_ID)
@@ -214,12 +240,14 @@ class BidServiceTest {
         when(bidRepository.getBidById(BID_ID)).thenReturn(Optional.of(bidEntity));
         when(taskRepository.getTaskById(TASK_ID)).thenReturn(Optional.of(taskEntity));
 
+        // when & then
         assertThrows(ForbiddenException.class, () -> bidService.acceptBid(BID_ID, DIFFERENT_CUSTOMER_ID));
         verify(userRepository, never()).getUserById(any());
     }
 
     @Test
     void givenNonPublishedTask_whenAcceptBid_thenThrowBadRequestException() {
+        // given
         BidEntity bidEntity = buildBidEntity()
             .withId(BID_ID)
             .withTaskId(TASK_ID)
@@ -234,12 +262,14 @@ class BidServiceTest {
         when(bidRepository.getBidById(BID_ID)).thenReturn(Optional.of(bidEntity));
         when(taskRepository.getTaskById(TASK_ID)).thenReturn(Optional.of(taskEntity));
 
+        // when & then
         assertThrows(BadRequestException.class, () -> bidService.acceptBid(BID_ID, CUSTOMER_ID));
         verify(userRepository, never()).getUserById(any());
     }
 
     @Test
     void givenExecutorNotFound_whenAcceptBid_thenThrowInternalErrorException() {
+        // given
         BidEntity bidEntity = buildBidEntity()
             .withId(BID_ID)
             .withTaskId(TASK_ID)
@@ -256,11 +286,13 @@ class BidServiceTest {
         when(taskRepository.getTaskById(TASK_ID)).thenReturn(Optional.of(taskEntity));
         when(userRepository.getUserById(CUSTOMER_ID)).thenReturn(Optional.empty());
 
+        // when & then
         assertThrows(InternalErrorException.class, () -> bidService.acceptBid(BID_ID, CUSTOMER_ID));
     }
 
     @Test
     void givenInsufficientBalance_whenAcceptBid_thenThrowBadRequestException() {
+        // given
         BidEntity bidEntity = buildBidEntity()
             .withId(BID_ID)
             .withTaskId(TASK_ID)
@@ -281,6 +313,7 @@ class BidServiceTest {
         when(taskRepository.getTaskById(TASK_ID)).thenReturn(Optional.of(taskEntity));
         when(userRepository.getUserById(CUSTOMER_ID)).thenReturn(Optional.of(customer));
 
+        // when & then
         assertThrows(BadRequestException.class, () -> bidService.acceptBid(BID_ID, CUSTOMER_ID));
         verify(userRepository, never()).updateBalance(any(), any());
         verify(paymentRepository, never()).createPayment(any());
