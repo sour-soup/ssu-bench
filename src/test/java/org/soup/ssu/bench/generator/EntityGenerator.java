@@ -50,6 +50,7 @@ public class EntityGenerator {
             .taskId(TASK_ID)
             .senderId(CUSTOMER_ID)
             .receiverId(EXECUTOR_ID)
+            .amount(BigInteger.TEN)
             .build();
     }
 

@@ -1,6 +1,5 @@
 package org.soup.ssu.bench.repository;
 
-import org.assertj.core.api.AssertionsForInterfaceTypes;
 import org.junit.jupiter.api.Test;
 import org.soup.ssu.bench.RepositoryTest;
 import org.soup.ssu.bench.repository.entity.TaskEntity;
